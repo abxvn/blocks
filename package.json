@@ -1,0 +1,33 @@
+{
+  "name": "@teku/blocks",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Repository for building blocks of Teku applications",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "local": "lerna exec -- yarn link"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tekuasia/blocks.git"
+  },
+  "keywords": [
+    "teku",
+    "tekuasia",
+    "building",
+    "blocks"
+  ],
+  "author": "Hung Luu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tekuasia/blocks/issues"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "homepage": "https://github.com/tekuasia/blocks#readme",
+  "devDependencies": {
+    "lerna": "^3.22.1"
+  }
+}

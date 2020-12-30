@@ -1,0 +1,26 @@
+{
+  "name": "@teku/firebase",
+  "version": "1.0.0",
+  "description": "Teku's Firebase / Firestore library",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tekuasia/blocks.git",
+    "directory": "firebase"
+  },
+  "keywords": [
+    "teku",
+    "building",
+    "blocks",
+    "firebase",
+    "firestore"
+  ],
+  "author": {
+    "name": "Hung Luu",
+    "email": "hungluu2106@gmail.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tekuasia/blocks/issues"
+  },
+  "homepage": "https://github.com/tekuasia/blocks#readme"
+}

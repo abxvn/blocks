@@ -1,0 +1,37 @@
+{
+    "extends": [
+      "eslint:recommended",
+      "react-app",
+      "react-app/jest",
+      "standard",
+      "standard-jsx"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 2017
+    },
+    "rules": {
+      "no-unused-vars": "warn",
+      "no-var": "error",
+      "consistent-return": "warn",
+      "complexity": ["warn", { "max": 15 }],
+      "padding-line-between-statements": [
+        "error",
+        { "blankLine": "always", "prev": "let", "next": "*" },
+        { "blankLine": "any", "prev": "let", "next": "let" },
+        { "blankLine": "any", "prev": "let", "next": "const" },
+        { "blankLine": "always", "prev": "const", "next": "*" },
+        { "blankLine": "any", "prev": "const", "next": "const" },
+        { "blankLine": "any", "prev": "const", "next": "let" },
+        { "blankLine": "always", "prev": "*", "next": "return" }
+      ]
+    },
+    "overrides": [
+      {
+        "files": "src/**/*.js",
+        "globals": {
+          "ga": true,
+          "$": true
+        }
+      }
+    ]
+  }

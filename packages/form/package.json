@@ -1,0 +1,35 @@
+{
+  "name": "@teku/form",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Teku's form library",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tekuasia/blocks.git",
+    "directory": "form"
+  },
+  "keywords": [
+    "teku",
+    "building",
+    "blocks",
+    "form"
+  ],
+  "author": {
+    "name": "Hung Luu",
+    "email": "hungluu2106@gmail.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tekuasia/blocks/issues"
+  },
+  "homepage": "https://github.com/tekuasia/blocks#readme",
+  "dependencies": {
+    "kind-of": "^6.0.3",
+    "lodash-es": "^4.17.15",
+    "eventemitter3": "^4.0.7"
+  }
+}

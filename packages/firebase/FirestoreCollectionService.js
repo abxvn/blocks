@@ -53,7 +53,10 @@ export default class FirestoreCollectionService {
   }
 
   async set (input) {
-    const { id, ...data } = this._apply('composeFilters', input)
+    const data = this._apply('composeFilters', input)
+    const id = data.id
+
+    delete data.id
 
     if (!id) {
       this.collection().add(data)

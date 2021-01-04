@@ -1,8 +1,6 @@
 {
     "extends": [
       "eslint:recommended",
-      "react-app",
-      "react-app/jest",
       "standard",
       "standard-jsx"
     ],
@@ -27,11 +25,20 @@
     },
     "overrides": [
       {
-        "files": "src/**/*.js",
-        "globals": {
-          "ga": true,
-          "$": true
-        }
+        "files": [
+          "packages/react/**/*.js"
+        ],
+        "extends": [
+          "eslint:recommended",
+          "standard",
+          "standard-jsx",
+          "react-app",
+          "react-app/jest"
+        ],
+        "env": {
+          "jest/globals": true
+        },
+        "plugins": ["jest"]
       }
     ]
   }

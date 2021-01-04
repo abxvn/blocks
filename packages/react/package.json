@@ -5,12 +5,12 @@
   "description": "Teku's React components",
   "files": [
     "README.md",
+    "LICENSE",
     "components/"
   ],
   "scripts": {
     "watch": "rollup -cw",
-    "build": "rm -rf components && rollup -c",
-    "preinstall": "npm run build"
+    "build": "rm -rf components && rollup -c"
   },
   "repository": {
     "type": "git",
@@ -43,8 +43,6 @@
     "autoprefixer": "^9.8.6",
     "glob": "^7.1.6",
     "node-sass": "^5.0.0",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
     "rollup": "^2.35.1",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-postcss": "^4.0.0"
@@ -61,6 +59,8 @@
     "classnames": "^2.2.6",
     "plyr": "^3.6.3",
     "prop-types": "^15.7.2",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
     "styled-components": "^5.2.1"
   }
 }

@@ -8,7 +8,7 @@ export default class TekuForm extends EventEmitter {
     super()
 
     const defaultOptions = {
-      il8n: {},
+      i18n: {},
       lang: DEFAULT_LANG,
       customValidators: {},
       // feature flags
@@ -171,7 +171,7 @@ export default class TekuForm extends EventEmitter {
 
   /**
    * Get error message for a field validation failure
-   * Support custom error messages throw il8n option, with rule error message nested in form.errors domain
+   * Support custom error messages throw i18n option, with rule error message nested in form.errors domain
    *
    * @param {string} fieldName
    * @param {string} ruleName
@@ -180,7 +180,7 @@ export default class TekuForm extends EventEmitter {
   _getErrorMessage (fieldName, ruleName, params) {
     const messages = getMessages(this.opt('lang'))
     const messageTemplate = this._translate(
-      // Support custom messages throw il8n option
+      // Support custom messages throw i18n option
       // Rule error message is nested in form.errors domain
       `form.errors.${ruleName}`,
       getKey(messages, ruleName, messages.invalid)
@@ -199,11 +199,11 @@ export default class TekuForm extends EventEmitter {
   }
 
   _translate (str, defaultMessage) {
-    return this.opt(`il8n.${this.opt('lang')}.${str}`, defaultMessage || str)
+    return this.opt(`i18n.${this.opt('lang')}.${str}`, defaultMessage || str)
   }
 
   _translateRuleName (ruleName, defaultMessage) {
-    // Support custom rule name throw il8n option, with rule name nested in form.rules domain
+    // Support custom rule name throw i18n option, with rule name nested in form.rules domain
     return this._translate(`form.rules.${ruleName}`, ruleName)
   }
 }

@@ -5,7 +5,10 @@
       "standard-jsx"
     ],
     "parserOptions": {
-      "ecmaVersion": 2017
+      "ecmaVersion": 7,
+      "ecmaFeatures": {
+        "experimentalObjectRestSpread": true
+      }
     },
     "rules": {
       "no-unused-vars": "warn",

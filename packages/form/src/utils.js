@@ -1,6 +1,6 @@
 import kindOf from 'kind-of'
 
-export { upperFirst, get as getKey, omit, pick } from 'lodash-es'
+export { upperFirst, get as getKey, omit, pick, assign } from 'lodash-es'
 export const isString = str => kindOf(str) === 'string'
 export const isFunction = fn => kindOf(fn) === 'function'
 export const diff = (newData, oldData, ignoreRemovedItems = false) => {

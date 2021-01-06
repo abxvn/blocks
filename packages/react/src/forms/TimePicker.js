@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
+import classnames from 'classnames'
 import Inputmask from 'inputmask'
 import styled from 'styled-components'
 
-export default function TimePicker ({ value, name, onChange, placeholder }) {
-  // const [data, setData] = useState(value)
+export default function TimePicker ({ id, className, value, name, onChange, placeholder }) {
   const inputRef = useRef()
   const displayedPlaceHolder = placeholder || '--:--'
 
@@ -20,16 +20,13 @@ export default function TimePicker ({ value, name, onChange, placeholder }) {
     masker.mask(inputRef.current)
   }, [])
 
-  // useEffect(() => {
-  //   onChange && onChange(data)
-  // }, [data])
-
   return (
     <TimePickerContainer className='time-picker'>
       <input
+        id={id}
         type='text'
         placeholder={displayedPlaceHolder}
-        className='form-control'
+        className={classnames('form-control', className)}
         name={name}
         value={value}
         ref={inputRef}

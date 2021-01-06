@@ -1,31 +1,30 @@
 import { useEffect, useState } from 'react'
 import usePermaRef from './usePermaRef'
+import useChangeDetection from './useChangeDetection'
 
-export default function useForm (form, { onError, onChange } = {}) {
+export default function useForm (form, data, { onError, onChange } = {}) {
   if (!form.getChanges && !form.merge) {
     throw TypeError('Teku form expected')
   }
 
   const formRef = usePermaRef(form)
-  const [formData, setFormData] = useState(form.data) // eslint-disable-line no-unused-vars
+  const [formData, setFormData] = useState(data) // eslint-disable-line no-unused-vars
 
-  useEffect(() => {
-    if (onError) {
-      formRef.on('error', onError)
-    }
-
-    if (onChange) {
-      formRef.on('change', () => {
-        setFormData(form.data)
-        onChange.apply(formRef, formRef.getChanges())
-      })
-    }
+  useEffect(function onMount () {
+    formRef.init(formData)
+    onError && formRef.on('error', onError)
+    onChange && formRef.on('change', onChange)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useChangeDetection(function onDataChanged () {
+    formRef.merge(formData)
+  }, [formData]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return [
     formData,
+    setFormData,
     function onFieldChanged (ev) {
-      formRef.merge(updateField(form.data, ev))
+      setFormData(updateField(formData, ev))
     }
   ]
 }

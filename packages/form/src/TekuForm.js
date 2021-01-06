@@ -1,10 +1,10 @@
 import EventEmitter from 'eventemitter3'
-import { diff, getKey, isFunction, isString, upperFirst } from './utils'
+import { diff, getKey, isFunction, isString, upperFirst, assign } from './utils'
 import getMessages, { SUPPORTED_LANGS } from '../lang'
 import validators, { REQUIRED_RULE } from './validators'
 
 export default class TekuForm extends EventEmitter {
-  constructor (rules, initData = {}, options = {}) {
+  constructor (rules, options = {}) {
     super()
 
     const defaultOptions = {
@@ -17,16 +17,26 @@ export default class TekuForm extends EventEmitter {
       shouldValidateChangesOnly: false
     }
 
-    this.initData = initData
     this.rules = rules
-    this.data = Object.assign({}, initData)
-    this.options = Object.assign(defaultOptions, options)
+    this.options = assign(defaultOptions, options)
+    this.init({})
 
     const lang = this.opt('lang')
 
     if (!SUPPORTED_LANGS.includes(lang)) {
       throw Error(`Unsupported language selected '${lang}''`)
     }
+  }
+
+  /**
+   * Re-init form with data
+   * @param {object} data
+   */
+  init (data) {
+    this.initData = assign({}, data)
+    this.data = assign({}, data)
+
+    return this
   }
 
   /**
@@ -41,13 +51,12 @@ export default class TekuForm extends EventEmitter {
       ? Object.keys(this.getChanges())
       : Object.keys(this.data)
 
-    const validations = fieldNames.map(fieldName => {
-      return this.validateField(fieldName).then(fieldErrors => {
+    const validations = fieldNames.map(fieldName =>
+      this.validateField(fieldName).then(fieldErrors => {
         if (fieldErrors.length) {
           errorList[fieldName] = fieldErrors
         }
-      })
-    })
+      }))
 
     return Promise.all(validations)
       .then(() => {
@@ -83,7 +92,7 @@ export default class TekuForm extends EventEmitter {
 
       let validateResult = fn(fieldValue)
 
-      if (validateResult.then) {
+      if (validateResult && validateResult.then) {
         validateResult = await validateResult
       }
 
@@ -109,9 +118,11 @@ export default class TekuForm extends EventEmitter {
     const changes = diff(fieldValues, this.data, true)
 
     if (Object.keys(changes).length) {
-      this.data = Object.assign({}, this.data, changes)
+      this.data = assign({}, this.data, changes)
       this.emit('change', changes, this)
     }
+
+    return this
   }
 
   get (fieldName) {

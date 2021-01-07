@@ -59,8 +59,7 @@ export const updateField = (oldData, inputOrEvent, customFieldName) => {
     value = input.value
   }
 
-  return {
-    ...oldData,
+  return Object.assign({}, oldData, {
     [fieldName]: value
-  }
+  })
 }

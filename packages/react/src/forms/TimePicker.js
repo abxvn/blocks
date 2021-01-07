@@ -18,7 +18,7 @@ export default function TimePicker ({ id, className, value, name, onChange, plac
     })
 
     masker.mask(inputRef.current)
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <TimePickerContainer className='time-picker'>

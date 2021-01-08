@@ -1,4 +1,4 @@
-const enMessages = {
+const messages = {
   required: 'Please provide %0',
   isEmail: '%0 should be valid email address',
   maxLength: '%0 shouldn\'t be longer than %3 characters',
@@ -8,6 +8,11 @@ const enMessages = {
   invalid: 'Invalid'
 }
 
-export default function getEnMessages () {
-  return enMessages
+export default {
+  lang: 'en',
+  messages: {
+    form: {
+      errors: messages
+    }
+  }
 }

@@ -1,7 +1,7 @@
 import EventEmitter from 'eventemitter3'
 import { diff, getKey, isFunction, isString, upperFirst, assign } from './utils'
-import getMessages, { SUPPORTED_LANGS } from '../lang'
 import validators, { REQUIRED_RULE } from './validators'
+import TekuFormTranslator, { DEFAULT_LANG } from './TekuFormTranslator'
 
 export default class TekuForm extends EventEmitter {
   constructor (rules, options = {}) {
@@ -21,11 +21,8 @@ export default class TekuForm extends EventEmitter {
     this.options = assign(defaultOptions, options)
     this.init({})
 
-    const lang = this.opt('lang')
-
-    if (!SUPPORTED_LANGS.includes(lang)) {
-      throw Error(`Unsupported language selected '${lang}''`)
-    }
+    this.translator = new TekuFormTranslator()
+    this.translate = str => this.translator.translate(str)
   }
 
   /**
@@ -90,20 +87,28 @@ export default class TekuForm extends EventEmitter {
     for (let idx = 0; idx < rules.length; idx++) {
       const { fn, name: ruleName, params } = this._getRule(rules[idx])
 
-      let validateResult = fn(fieldValue)
+      try {
+        let validateResult = fn(fieldValue)
 
-      if (validateResult && validateResult.then) {
-        validateResult = await validateResult
-      }
+        if (validateResult && validateResult.then) {
+          validateResult = await validateResult
+        }
 
-      if (!validateResult) {
-        errors.push(
-          upperFirst(this._getErrorMessage(
-            fieldName,
-            ruleName,
-            params
-          ))
-        )
+        if (!validateResult) {
+          errors.push(
+            upperFirst(this._getErrorMessage(
+              fieldName,
+              ruleName,
+              params
+            ))
+          )
+
+          if (this.opt('shouldFailFast')) {
+            break
+          }
+        }
+      } catch (err) {
+        errors.push(upperFirst(this.translate(err.message)))
 
         if (this.opt('shouldFailFast')) {
           break
@@ -189,18 +194,20 @@ export default class TekuForm extends EventEmitter {
    * @param {any} params
    */
   _getErrorMessage (fieldName, ruleName, params) {
-    const messages = getMessages(this.opt('lang'))
-    const messageTemplate = this._translate(
-      // Support custom messages throw i18n option
-      // Rule error message is nested in form.errors domain
-      `form.errors.${ruleName}`,
-      getKey(messages, ruleName, messages.invalid)
-    )
+    const messageTemplate = this.translate([
+        // Support custom messages throw i18n option
+        // Rule error message is nested in form.errors domain
+        `form.errors.${ruleName}`,
+        'form.errors.invalid'
+    ])
     const fieldValue = this.get(fieldName)
     const paramValues = [
-      this._translate(fieldName),
+      this.translate(fieldName),
       fieldValue,
-      this._translateRuleName(ruleName),
+      this.translate([
+        `form.rules.${ruleName}`,
+        ruleName
+      ]),
       ...params
     ]
 
@@ -208,19 +215,9 @@ export default class TekuForm extends EventEmitter {
       paramValues[bindParam.replace('%', '')] || bindParam
     )
   }
-
-  _translate (str, defaultMessage) {
-    return this.opt(`i18n.${this.opt('lang')}.${str}`, defaultMessage || str)
-  }
-
-  _translateRuleName (ruleName, defaultMessage) {
-    // Support custom rule name throw i18n option, with rule name nested in form.rules domain
-    return this._translate(`form.rules.${ruleName}`, ruleName)
-  }
 }
 
 const RULE_PARAMS_REGEX = /^[^:,]+:([^:,]+)+$/
-const DEFAULT_LANG = 'en'
 
 /**
  * A list of validation errors, grouped by field names

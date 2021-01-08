@@ -1,4 +1,4 @@
-const viMessages = {
+const messages = {
   required: 'Vui lòng nhập %0',
   isEmail: 'Địa chỉ email không đúng định dạng',
   maxLength: '%0 không được dài quá %3 ký tự',
@@ -8,6 +8,11 @@ const viMessages = {
   invalid: 'Sai định dạng'
 }
 
-export default function getViMessages () {
-  return viMessages
+export default {
+  lang: 'vi',
+  messages: {
+    form: {
+      errors: messages
+    }
+  }
 }

@@ -6,6 +6,7 @@ export default function StateButton ({
   isLoading,
   children,
   loadingChildren,
+  disabled,
   ...props
 }) {
   let contents = children
@@ -18,7 +19,7 @@ export default function StateButton ({
     <button
       {...props}
       className={classnames('btn btn-primary', className)}
-      disabled={isLoading}
+      disabled={disabled || isLoading}
     >
       {contents}
     </button>

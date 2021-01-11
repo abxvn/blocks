@@ -1,3 +1,4 @@
+import { join } from 'path'
 import glob from 'glob'
 import resolve from '@rollup/plugin-node-resolve'
 import babel from '@rollup/plugin-babel'
@@ -10,7 +11,9 @@ import autoprefixer from 'autoprefixer'
 const baseConfig = {
   plugins: [
     // This prevents needing an additional `external` prop in this config file by automaticall excluding peer dependencies
-    peerDepsExternal(),
+    peerDepsExternal({
+      packageJsonPath: join(__dirname, 'package.json')
+    }),
     // Convert CommonJS modules to ES6
     // commonjs({
     //   include: 'node_modules/**',

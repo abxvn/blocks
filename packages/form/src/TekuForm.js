@@ -8,8 +8,6 @@ export default class TekuForm extends EventEmitter {
     super()
 
     const defaultOptions = {
-      i18n: {},
-      lang: DEFAULT_LANG,
       customValidators: {},
       // feature flags
       shouldFailFast: true,

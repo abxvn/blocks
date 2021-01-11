@@ -94,7 +94,7 @@ export default class TekuForm extends EventEmitter {
           validateResult = await validateResult
         }
 
-        if (!validateResult) {
+        if (validateResult === false) {
           errors.push(
             upperFirst(this._getErrorMessage(
               fieldName,

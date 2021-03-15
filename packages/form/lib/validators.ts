@@ -1,7 +1,7 @@
 import isIn from 'validator/lib/isIn'
 import isEmail from 'validator/lib/isEmail'
 import isDate from 'validator/lib/isDate'
-import { isString } from 'lodash-es'
+import { is } from '../lib/utils'
 
 export const emptyValues = ['', null, undefined]
 export const REQUIRED_RULE = 'required'
@@ -15,7 +15,7 @@ const extraValidators = {
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   in: (value: string, ...checkValues: string[]): boolean => isIn(value, checkValues),
   date: (value: string, format = 'YYYY/MM/DD'): boolean => isDate(value, { format }),
-  time: (value: string): boolean => isString(value) && value.match(TIME_REGEX) !== null
+  time: (value: string): boolean => is('string', value) && value.match(TIME_REGEX) !== null
 }
 
 const validators = Object.assign({

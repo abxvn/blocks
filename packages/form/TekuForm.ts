@@ -1,11 +1,12 @@
 import EventEmitter from 'eventemitter3'
-import { upperFirst, get as getKey, assign, zipObject, isString } from 'lodash-es'
+import { upperFirst, get as getKey, assign, zipObject } from 'lodash-es'
 import validators, { REQUIRED_RULE } from './lib/validators'
 import TekuFormTranslator from './TekuFormTranslator'
 import type {
   TranslateFn, ValidationErrors, ValidationFieldErrors, ValidationFn, ValidationRules
 } from './lib/types'
 import ITekuForm from './lib/ITekuForm'
+import { diff, is } from './lib/utils'
 
 const RULE_PARAMS_REGEX = /^[^:,]+:([^:,]+)+$/
 
@@ -70,8 +71,8 @@ export default class TekuForm extends EventEmitter implements ITekuForm {
 
     let rules = this.rules[fieldName] ?? []
 
-    if (isString(rules)) {
-      rules = (rules).split('|')
+    if (is('string', rules)) {
+      rules = (rules as string).split('|')
     }
 
     // Ignore validate empty fields without 'required' rule
@@ -117,7 +118,7 @@ export default class TekuForm extends EventEmitter implements ITekuForm {
     return errors
   }
 
-  merge (fieldValues) {
+  merge (fieldValues: any): this {
     const changes = diff(fieldValues, this.data, true)
 
     if (Object.keys(changes).length > 0) {
@@ -128,14 +129,14 @@ export default class TekuForm extends EventEmitter implements ITekuForm {
     return this
   }
 
-  get (fieldName) {
+  get (fieldName: string): any {
     return getKey(this.data, fieldName)
   }
 
   /**
    * Get change from init data
    */
-  getChanges () {
+  getChanges (): any {
     return diff(this.data, this.initData)
   }
 
@@ -149,18 +150,18 @@ export default class TekuForm extends EventEmitter implements ITekuForm {
    * @param {String|Function} rule rule
    */
   private getRule (rule: string | Function): { fn: ValidationFn, name: string, params: any } {
-    let name: string = isString(rule) ? (rule) : (rule).name
+    let name: string = is('string', rule) ? rule as string : (rule as Function).name
     let params: any[] = []
     let fn: ValidationFn
 
-    if (isString(rule)) {
-      const ruleString: string = rule
+    if (is('string', rule)) {
+      const ruleString: string = rule as string
       // for example, rule is in:1,10 or maxLength:30
       if (RULE_PARAMS_REGEX.test(ruleString)) {
         [name, ...params] = ruleString.split(/[:,]/)
       }
 
-      if (isFunction(this.opt(`validators.${name}`))) {
+      if (is('function', this.opt(`validators.${name}`))) {
         fn = this.opt(`validators.${name}`).bind(this)
       } else {
         throw Error(`Validator ${name} is not defined`)
@@ -169,7 +170,7 @@ export default class TekuForm extends EventEmitter implements ITekuForm {
       if (params.length > 0) {
         fn = async (value: any): Promise<boolean> => await fn.apply(this, [value, ...params])
       }
-    } else if (!isFunction(rule)) {
+    } else if (!is('function', rule)) {
       throw Error('Invalid validator function')
     } else {
       fn = rule as ValidationFn

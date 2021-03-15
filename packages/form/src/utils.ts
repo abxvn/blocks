@@ -1,5 +1,7 @@
 import kindOf from 'kind-of'
 
+declare module 'kind-of'
+
 export { upperFirst, get as getKey, has as hasKey, omit, pick, assign } from 'lodash-es'
 export const isString = str => kindOf(str) === 'string'
 export const isArray = arr => kindOf(arr) === 'array'

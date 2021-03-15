@@ -30,15 +30,16 @@ const getConfig = async () => ({
     libraryTarget: 'commonjs2'
   },
   resolve: {
-    extensions: ['.ts', '.js']
+    extensions: ['.ts', '.js', '.tsx']
   },
   module: {
     rules: [
       {
-        test: /\.ts$/,
+        test: /\.tsx?$/,
         use: [
           'ts-loader'
-        ]
+        ],
+        exclude: /node_modules/
       }
     ]
   },

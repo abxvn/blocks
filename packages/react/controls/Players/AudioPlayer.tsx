@@ -3,13 +3,19 @@ import classnames from 'classnames'
 import VideoPlayer from './VideoPlayer'
 import styled from 'styled-components'
 
-export default function AudioPlayer (props) {
+interface AudioPlayerProps {
+  media: string
+  className?: string
+}
+const AudioPlayer: React.FC<AudioPlayerProps> = (props: AudioPlayerProps) => {
   return (
     <AudioPlayerWrapper className={classnames('audio-player', props.className)}>
       <VideoPlayer {...props} />
     </AudioPlayerWrapper>
   )
 }
+
+export default AudioPlayer
 
 const AudioPlayerWrapper = styled.div`
   height: 50px;

@@ -1,17 +1,24 @@
 import React from 'react'
 import classnames from 'classnames'
 
-export default function StateButton ({
+interface StateButtonProps {
+  className?: string
+  isLoading?: boolean
+  children: any
+  loadingChildren: any
+  disabled?: boolean
+}
+const StateButton: React.FC<StateButtonProps> = ({
   className,
   isLoading,
   children,
   loadingChildren,
   disabled,
   ...props
-}) {
+}: StateButtonProps) => {
   let contents = children
 
-  if (isLoading && loadingChildren) {
+  if (Boolean(isLoading) && (loadingChildren != null)) {
     contents = loadingChildren
   }
 
@@ -19,9 +26,11 @@ export default function StateButton ({
     <button
       {...props}
       className={classnames('btn btn-primary', className)}
-      disabled={disabled || isLoading}
+      disabled={Boolean(disabled) || isLoading}
     >
       {contents}
     </button>
   )
 }
+
+export default StateButton

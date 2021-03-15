@@ -1,10 +1,15 @@
 import React, { Suspense } from 'react'
 
-export default function StateComponent ({
+interface StateComponentProps {
+  isLoading: boolean
+  loadingChildren: any
+  children: any
+}
+const StateComponent: React.FC<StateComponentProps> = ({
   isLoading,
   loadingChildren,
   children
-}) {
+}: StateComponentProps) => {
   const contents = isLoading ? loadingChildren : children
 
   return (
@@ -13,3 +18,5 @@ export default function StateComponent ({
     </Suspense>
   )
 }
+
+export default StateComponent

@@ -35,10 +35,15 @@
   "dependencies": {
     "classnames": "^2.2.6",
     "plyr": "^3.6.3",
-    "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "styled-components": "^5.2.1",
     "inputmask": "^5.0.5"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.3",
+    "@types/classnames": "^2.2.3",
+    "@types/inputmask": "^5.0.0",
+    "@types/styled-components": "^5.1.9"
   }
 }

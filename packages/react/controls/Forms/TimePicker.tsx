@@ -1,11 +1,21 @@
-import React, { useEffect, useRef } from 'react'
+import React, { ChangeEventHandler, useEffect, useRef } from 'react'
 import classnames from 'classnames'
 import Inputmask from 'inputmask'
 import styled from 'styled-components'
 
-export default function TimePicker ({ id, className, value, name, onChange, placeholder }) {
-  const inputRef = useRef()
-  const displayedPlaceHolder = placeholder || '--:--'
+interface TimePickerProps {
+  id: string
+  className?: string
+  name: string
+  value: any
+  onChange: ChangeEventHandler<HTMLInputElement>
+  placeholder?: string
+}
+
+const TimePicker: React.FC<TimePickerProps> = (props: TimePickerProps) => {
+  const { id, className, value, name, onChange, placeholder } = props
+  const inputRef = useRef<HTMLInputElement>(null)
+  const displayedPlaceHolder = placeholder ?? '--:--'
 
   useEffect(() => {
     const masker = new Inputmask({
@@ -17,8 +27,8 @@ export default function TimePicker ({ id, className, value, name, onChange, plac
       outputFormat: 'HH:MM'
     })
 
-    masker.mask(inputRef.current)
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    inputRef.current !== null && masker.mask(inputRef.current)
+  }, [])
 
   return (
     <TimePickerContainer className='time-picker'>
@@ -35,6 +45,8 @@ export default function TimePicker ({ id, className, value, name, onChange, plac
     </TimePickerContainer>
   )
 }
+
+export default TimePicker
 
 const TimePickerContainer = styled.div`
   display: flex;

@@ -1,10 +1,22 @@
 import EventEmitter from 'eventemitter3'
-import { diff, getKey, isFunction, isString, upperFirst, assign } from './utils'
-import validators, { REQUIRED_RULE } from './validators'
+import { upperFirst, get as getKey, assign, zipObject, isString } from 'lodash-es'
+import validators, { REQUIRED_RULE } from './lib/validators'
 import TekuFormTranslator from './TekuFormTranslator'
+import type {
+  TranslateFn, ValidationErrors, ValidationFieldErrors, ValidationFn, ValidationRules
+} from './lib/types'
+import ITekuForm from './lib/ITekuForm'
 
-export default class TekuForm extends EventEmitter {
-  constructor (rules, options = {}) {
+const RULE_PARAMS_REGEX = /^[^:,]+:([^:,]+)+$/
+
+export default class TekuForm extends EventEmitter implements ITekuForm {
+  private readonly options: any = {}
+  private readonly translator: TekuFormTranslator = new TekuFormTranslator()
+  public translate: TranslateFn = str => this.translator.translate(str)
+  private initData: any = {}
+  private data: any = {}
+
+  constructor (public readonly rules: ValidationRules, options = {}) {
     super()
 
     const defaultOptions = {
@@ -14,20 +26,16 @@ export default class TekuForm extends EventEmitter {
       shouldValidateChangesOnly: false
     }
 
-    this.rules = rules
     this.init({})
-
     this.options = assign(defaultOptions, options)
     this.options.validators = assign({}, validators, getKey(options, 'validators', null))
-    this.translator = new TekuFormTranslator()
-    this.translate = str => this.translator.translate(str)
   }
 
   /**
    * Re-init form with data
    * @param {object} data
    */
-  init (data) {
+  init (data: any): this {
     this.initData = assign({}, data)
     this.data = assign({}, data)
 
@@ -36,24 +44,16 @@ export default class TekuForm extends EventEmitter {
 
   /**
    * Validate all fields
-   *
-   * @return {Promise<ValidationErrorList>} resolves error list
    */
-  async validate () {
-    const errorList = {}
-
-    const fieldNames = this.opt('shouldValidateChangesOnly')
+  async validate (): Promise<ValidationErrors> {
+    const fieldNames = (this.opt('shouldValidateChangesOnly') as boolean)
       ? Object.keys(this.getChanges())
       : Object.keys(this.data)
 
-    const validations = fieldNames.map(fieldName =>
-      this.validateField(fieldName).then(fieldErrors => {
-        if (fieldErrors.length) {
-          errorList[fieldName] = fieldErrors
-        }
-      }))
+    const validations = fieldNames.map(async fieldName => await this.validateField(fieldName))
+    const errorList: ValidationErrors = zipObject(fieldNames, await Promise.all(validations))
 
-    return Promise.all(validations)
+    return await Promise.all(validations)
       .then(() => {
         this.emit('error', errorList, this)
 
@@ -63,18 +63,15 @@ export default class TekuForm extends EventEmitter {
 
   /**
    * Force running validations on a field
-   *
-   * @param {string} fieldName
-   * @return {Promise<Array<string>>} resolves a list of error messages
    */
-  async validateField (fieldName) {
+  async validateField (fieldName: string): Promise<ValidationFieldErrors> {
     const fieldValue = this.get(fieldName)
-    const errors = []
+    const errors: ValidationFieldErrors = []
 
-    let rules = this.rules[fieldName] || []
+    let rules = this.rules[fieldName] ?? []
 
     if (isString(rules)) {
-      rules = rules.split('|')
+      rules = (rules).split('|')
     }
 
     // Ignore validate empty fields without 'required' rule
@@ -83,32 +80,35 @@ export default class TekuForm extends EventEmitter {
     }
 
     for (let idx = 0; idx < rules.length; idx++) {
-      const { fn, name: ruleName, params } = this._getRule(rules[idx])
+      const { fn, name: ruleName, params } = this.getRule(rules[idx])
 
       try {
-        let validateResult = fn(fieldValue)
+        const validateResult = fn(fieldValue)
+        let result: boolean
 
-        if (validateResult && validateResult.then) {
-          validateResult = await validateResult
+        if ((validateResult as Promise<boolean>).then instanceof Function) {
+          result = await validateResult
+        } else {
+          result = validateResult as boolean
         }
 
-        if (validateResult === false) {
+        if (!result) {
           errors.push(
-            upperFirst(this._getErrorMessage(
+            upperFirst(this.getErrorMessage(
               fieldName,
               ruleName,
               params
             ))
           )
 
-          if (this.opt('shouldFailFast')) {
+          if (this.opt('shouldFailFast') as boolean) {
             break
           }
         }
       } catch (err) {
         errors.push(upperFirst(this.translate(err.message)))
 
-        if (this.opt('shouldFailFast')) {
+        if (this.opt('shouldFailFast') as boolean) {
           break
         }
       }
@@ -120,7 +120,7 @@ export default class TekuForm extends EventEmitter {
   merge (fieldValues) {
     const changes = diff(fieldValues, this.data, true)
 
-    if (Object.keys(changes).length) {
+    if (Object.keys(changes).length > 0) {
       this.data = assign({}, this.data, changes)
       this.emit('change', changes, this)
     }
@@ -139,8 +139,8 @@ export default class TekuForm extends EventEmitter {
     return diff(this.data, this.initData)
   }
 
-  opt (optName, defaultValue) {
-    return getKey(this.options, optName, this.options[optName] || defaultValue)
+  opt (optName: string, defaultValue?: any): any {
+    return getKey(this.options, optName, this.options[optName] ?? defaultValue)
   }
 
   /**
@@ -148,15 +148,16 @@ export default class TekuForm extends EventEmitter {
    *
    * @param {String|Function} rule rule
    */
-  _getRule (rule) {
-    let name = isString(rule) ? rule : rule.name
-    let fn = rule
-    let params = []
+  private getRule (rule: string | Function): { fn: ValidationFn, name: string, params: any } {
+    let name: string = isString(rule) ? (rule) : (rule).name
+    let params: any[] = []
+    let fn: ValidationFn
 
     if (isString(rule)) {
+      const ruleString: string = rule
       // for example, rule is in:1,10 or maxLength:30
-      if (rule.match(RULE_PARAMS_REGEX)) {
-        [name, ...params] = rule.split(/[:,]/)
+      if (RULE_PARAMS_REGEX.test(ruleString)) {
+        [name, ...params] = ruleString.split(/[:,]/)
       }
 
       if (isFunction(this.opt(`validators.${name}`))) {
@@ -165,13 +166,13 @@ export default class TekuForm extends EventEmitter {
         throw Error(`Validator ${name} is not defined`)
       }
 
-      if (params.length) {
-        const oldFn = fn
-
-        fn = value => oldFn.apply(this, [value, ...params])
+      if (params.length > 0) {
+        fn = async (value: any): Promise<boolean> => await fn.apply(this, [value, ...params])
       }
     } else if (!isFunction(rule)) {
       throw Error('Invalid validator function')
+    } else {
+      fn = rule as ValidationFn
     }
 
     return {
@@ -189,15 +190,15 @@ export default class TekuForm extends EventEmitter {
    * @param {string} ruleName
    * @param {any} params
    */
-  _getErrorMessage (fieldName, ruleName, params) {
+  getErrorMessage (fieldName: string, ruleName: string, params: any): string {
+    // Support custom messages throw i18n option
+    // Rule error message is nested in form.errors domain
     const messageTemplate = this.translate([
-        // Support custom messages throw i18n option
-        // Rule error message is nested in form.errors domain
         `form.errors.${ruleName}`,
         'form.errors.invalid'
     ])
     const fieldValue = this.get(fieldName)
-    const paramValues = [
+    const paramValues: any[] = [
       this.translate(fieldName),
       fieldValue,
       this.translate([
@@ -207,15 +208,10 @@ export default class TekuForm extends EventEmitter {
       ...params
     ]
 
-    return messageTemplate && messageTemplate.replace(/%\d+/g, bindParam =>
-      paramValues[bindParam.replace('%', '')] || bindParam
-    )
+    return messageTemplate !== ''
+      ? messageTemplate.replace(/%\d+/g, (bindParam: any) =>
+        paramValues[bindParam.replace('%', '')] ?? bindParam
+      )
+      : ''
   }
 }
-
-const RULE_PARAMS_REGEX = /^[^:,]+:([^:,]+)+$/
-
-/**
- * A list of validation errors, grouped by field names
- * @typedef {{string, Array<string>}} ValidationErrorList
- */

@@ -1,5 +1,8 @@
-import en from '../lang/en'
-import { getKey, isString, isArray, hasKey } from './utils'
+import en from './lang/en'
+import type {
+  MessageData
+} from './lib/types'
+import { get as getKey, has as hasKey, isString, isArray } from 'lodash-es'
 
 export const DEFAULT_LANG = 'en'
 
@@ -15,7 +18,7 @@ export default class TekuFormTranslator {
     this.lang = lang
   }
 
-  load (data: { lang: string, messages: any }): void {
+  load (data: MessageData): void {
     const { lang, messages } = data
 
     this.resources[lang] = messages
@@ -23,14 +26,14 @@ export default class TekuFormTranslator {
 
   translate (texts: string[] | string): string {
     if (isString(texts)) {
-      return getKey(this.resources, `${this.lang}.${texts as string}`, texts)
+      return getKey(this.resources, `${this.lang}.${texts}`, texts)
     } else if (isArray(texts)) {
       if (texts.length === 0) {
         throw TypeError('No texts provided for translations')
       }
 
       const lastFallbackText = texts[texts.length - 1]
-      const firstFoundText = (texts as string[]).find(text => this.has(text))
+      const firstFoundText = (texts).find(text => this.has(text))
 
       return firstFoundText !== undefined ? this.translate(firstFoundText) : lastFallbackText
     } else {

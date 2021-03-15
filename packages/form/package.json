@@ -29,9 +29,11 @@
   "homepage": "https://github.com/tekuasia/blocks#readme",
   "dependencies": {
     "kind-of": "^6.0.3",
-    "eventemitter3": "^4.0.7"
+    "eventemitter3": "^4.0.7",
+    "validator": "^13.5.2"
   },
   "devDependencies": {
-    "@types/kind-of": "^6.0.0"
+    "@types/kind-of": "^6.0.0",
+    "@types/validator": "^13.1.3"
   }
 }

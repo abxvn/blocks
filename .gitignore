@@ -104,3 +104,5 @@ dist
 .tern-port
 
 packages/**/index.js
+packages/**/index.d.ts
+packages/**/index.d.ts.map

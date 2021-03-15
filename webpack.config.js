@@ -54,8 +54,8 @@ const getConfig = async () => ({
       NODE_ENV: JSON.stringify(NODE_ENV)
     })
   ],
-  watch: NODE_ENV === 'development'
-  // devtool: NODE_ENV === 'development' && 'source-map'
+  watch: NODE_ENV === 'development',
+  devtool: NODE_ENV === 'development' && 'inline-source-map'
 })
 
 module.exports = getConfig

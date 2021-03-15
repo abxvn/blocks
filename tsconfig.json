@@ -3,9 +3,10 @@
     "./packages/"
   ],
   "compilerOptions": {
+    "declaration": true,
     "module": "commonjs",
     "target": "es6",
-    "jsx": "preserve",
+    "jsx": "react",
     "lib": [
       "dom",
       "esnext"

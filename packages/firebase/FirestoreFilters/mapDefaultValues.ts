@@ -1,6 +1,4 @@
-import IFirestoreCollectionService from '../lib/IFirestoreCollectionService'
-
-export default function mapDefaultValues (service: IFirestoreCollectionService, mappedValues: any): any {
+export default function mapDefaultValues (service: any, mappedValues: any): any {
   const data = mappedValues
 
   for (const field in service.defaultValues) {

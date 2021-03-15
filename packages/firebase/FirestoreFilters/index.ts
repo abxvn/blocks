@@ -1,16 +1,5 @@
-import composeFinalizeInput from './composeFinalizeInput'
-import composeIgnoreDefaultValues from './composeIgnoreDefaultValues'
-import composeRemoveEmptyValues from './composeRemoveEmptyValues'
-import mapDefaultValues from './mapDefaultValues'
-import mapDoc from './mapDoc'
-
-export default {
-  // Map filters
-  mapDoc,
-  mapDefaultValues,
-
-  // Compose filter
-  composeFinalizeInput,
-  composeIgnoreDefaultValues,
-  composeRemoveEmptyValues
-}
+export { default as composeIgnoreDefaultValues } from './composeIgnoreDefaultValues'
+export { default as composeRemoveEmptyValues } from './composeRemoveEmptyValues'
+export { default as mapDefaultValues } from './mapDefaultValues'
+export { default as mapDoc } from './mapDoc'
+export { default as composeFinalizeInput } from './composeFinalizeInput'

@@ -1,6 +1,4 @@
-import IFirestoreCollectionService from '../lib/IFirestoreCollectionService'
-
-export default function composeIgnoreDefaultValues (service: IFirestoreCollectionService, input: any): any {
+export default function composeIgnoreDefaultValues (service: any, input: any): any {
   const data: any = {}
 
   for (const field in input) {

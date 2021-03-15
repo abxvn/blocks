@@ -1,6 +1,4 @@
-import IFirestoreCollectionService from '../lib/IFirestoreCollectionService'
-
-export default function composeRemoveEmptyValues (service: IFirestoreCollectionService, input: any): any {
+export default function composeRemoveEmptyValues (service: any, input: any): any {
   const data: any = {}
   const emptyValues = ['', undefined]
 

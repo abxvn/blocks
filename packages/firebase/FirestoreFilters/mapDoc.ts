@@ -1,6 +1,4 @@
-import IFirestoreCollectionService from '../lib/IFirestoreCollectionService'
-
-export default function mapDoc (service: IFirestoreCollectionService, doc: any): any {
+export default function mapDoc (service: any, doc: any): any {
   if (service._map instanceof Function) {
     return service._map(doc)
   } else if (doc?.exists !== undefined) {

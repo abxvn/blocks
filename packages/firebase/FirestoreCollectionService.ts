@@ -1,16 +1,18 @@
 import { CollectionReference, DocumentReference, Query, DocumentData, OrderByDirection } from '@firebase/firestore-types'
 
-import composeRemoveEmptyValues from './FirestoreFilters/composeRemoveEmptyValues'
-import composeIgnoreDefaultValues from './FirestoreFilters/composeIgnoreDefaultValues'
-import composeFinalizeInput from './FirestoreFilters/composeFinalizeInput'
-import mapDefaultValues from './FirestoreFilters/mapDefaultValues'
-import mapDoc from './FirestoreFilters/mapDoc'
+import {
+  composeRemoveEmptyValues,
+  composeIgnoreDefaultValues,
+  composeFinalizeInput,
+  mapDefaultValues,
+  mapDoc
+} from './FirestoreFilters/'
 import IFirestoreCollectionService from './lib/IFirestoreCollectionService'
 import { FirestorePluggableFilter } from './lib/types'
 
 export default class FirestoreCollectionService implements IFirestoreCollectionService {
-  private readonly defaultLimit: number = 20
-  private readonly defaultValues = {}
+  defaultLimit: number = 20
+  defaultValues = {}
 
   /**
    * Map (output) filters

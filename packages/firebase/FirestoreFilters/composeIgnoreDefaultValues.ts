@@ -2,7 +2,7 @@ export default function composeIgnoreDefaultValues (service: any, input: any): a
   const data: any = {}
 
   for (const field in input) {
-    // only copy values which aren't not set by default
+    // only copy values which aren't set by default
     if (service.defaultValues[field] !== undefined || service.defaultValues[field] !== input[field]) {
       data[field] = input[field]
     }

@@ -1,14 +1,13 @@
 import EventEmitter from 'eventemitter3'
 import { diff, getKey, isFunction, isString, upperFirst, assign } from './utils'
 import validators, { REQUIRED_RULE } from './validators'
-import TekuFormTranslator, { DEFAULT_LANG } from './TekuFormTranslator'
+import TekuFormTranslator from './TekuFormTranslator'
 
 export default class TekuForm extends EventEmitter {
   constructor (rules, options = {}) {
     super()
 
     const defaultOptions = {
-      customValidators: {},
       // feature flags
       shouldFailFast: true,
       shouldValidate: true,
@@ -16,9 +15,10 @@ export default class TekuForm extends EventEmitter {
     }
 
     this.rules = rules
-    this.options = assign(defaultOptions, options)
     this.init({})
 
+    this.options = assign(defaultOptions, options)
+    this.options.validators = assign({}, validators, getKey(options, 'validators', null))
     this.translator = new TekuFormTranslator()
     this.translate = str => this.translator.translate(str)
   }
@@ -159,10 +159,8 @@ export default class TekuForm extends EventEmitter {
         [name, ...params] = rule.split(/[:,]/)
       }
 
-      if (isFunction(this.opt(`customValidators.${name}`))) {
-        fn = this.opt(`customValidators.${name}`).bind(this)
-      } else if (isFunction(validators[name])) {
-        fn = validators[name].bind(this)
+      if (isFunction(this.opt(`validators.${name}`))) {
+        fn = this.opt(`validators.${name}`).bind(this)
       } else {
         throw Error(`Validator ${name} is not defined`)
       }

@@ -3,7 +3,7 @@
     "./packages/"
   ],
   "compilerOptions": {
-    "declaration": true,
+    // "declaration": true,
     "module": "commonjs",
     "target": "es6",
     "jsx": "react",

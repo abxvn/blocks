@@ -25,6 +25,5 @@
   "devDependencies": {
     "@firebase/firestore-types": "^2.2.0"
   },
-  "types": "@teku-blocks/types/firebase/index.d.ts",
   "homepage": "https://github.com/tekuasia/blocks#readme"
 }

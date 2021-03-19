@@ -1,19 +1,23 @@
 {
-  "name": "@teku-blocks/firebase",
+  "name": "@teku-blocks/resolve",
   "private": true,
   "version": "1.0.0",
-  "description": "Teku's Firebase / Firestore library",
+  "description": "Teku's async resolve",
+  "files": [
+    "README.md",
+    "LICENSE",
+    "components/"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tekuasia/blocks.git",
-    "directory": "packages/firebase"
+    "directory": "packages/resolve"
   },
   "keywords": [
     "teku",
     "building",
     "blocks",
-    "firebase",
-    "firestore"
+    "resolve"
   ],
   "author": {
     "name": "Hung Luu",
@@ -22,9 +26,6 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/tekuasia/blocks/issues"
-  },
-  "devDependencies": {
-    "@firebase/firestore-types": "^2.2.0"
   },
   "homepage": "https://github.com/tekuasia/blocks#readme"
 }

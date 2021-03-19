@@ -6,16 +6,12 @@
   "files": [
     "README.md",
     "LICENSE",
-    "components/"
+    "**/*.js"
   ],
-  "scripts": {
-    "watch": "rollup -cw",
-    "build": "rm -rf components && rollup -c"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tekuasia/blocks.git",
-    "directory": "react"
+    "directory": "packages/react"
   },
   "keywords": [
     "teku",

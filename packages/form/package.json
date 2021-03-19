@@ -1,5 +1,5 @@
 {
-  "name": "@teku/form",
+  "name": "@teku-blocks/form",
   "private": true,
   "version": "1.0.0",
   "description": "Teku's form library",
@@ -29,7 +29,11 @@
   "homepage": "https://github.com/tekuasia/blocks#readme",
   "dependencies": {
     "kind-of": "^6.0.3",
-    "lodash-es": "^4.17.15",
-    "eventemitter3": "^4.0.7"
+    "eventemitter3": "^4.0.7",
+    "validator": "^13.5.2"
+  },
+  "devDependencies": {
+    "@types/kind-of": "^6.0.0",
+    "@types/validator": "^13.1.3"
   }
 }

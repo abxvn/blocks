@@ -1,5 +1,5 @@
 {
-  "name": "@teku/firebase",
+  "name": "@teku-blocks/firebase",
   "version": "1.0.0",
   "description": "Teku's Firebase / Firestore library",
   "repository": {
@@ -21,6 +21,9 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/tekuasia/blocks/issues"
+  },
+  "devDependencies": {
+    "@firebase/firestore-types": "^2.2.0"
   },
   "homepage": "https://github.com/tekuasia/blocks#readme"
 }

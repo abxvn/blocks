@@ -1,5 +1,5 @@
 {
-  "name": "@teku/react",
+  "name": "@teku-blocks/react",
   "private": true,
   "version": "1.0.0",
   "description": "Teku's React components",
@@ -32,37 +32,18 @@
     "url": "https://github.com/tekuasia/blocks/issues"
   },
   "homepage": "https://github.com/tekuasia/blocks#readme",
-  "devDependencies": {
-    "@babel/cli": "^7.12.10",
-    "@babel/core": "^7.12.10",
-    "@babel/preset-env": "^7.12.11",
-    "@babel/preset-react": "^7.12.10",
-    "@rollup/plugin-babel": "^5.2.2",
-    "@rollup/plugin-commonjs": "^17.0.0",
-    "@rollup/plugin-node-resolve": "^11.0.1",
-    "autoprefixer": "^9.8.6",
-    "glob": "^7.1.6",
-    "node-sass": "^5.0.0",
-    "rollup": "^2.35.1",
-    "rollup-plugin-peer-deps-external": "^2.2.4",
-    "rollup-plugin-postcss": "^4.0.0"
-  },
-  "peerDependencies": {
-    "classnames": "^2.2.6",
-    "plyr": "^3.6.3",
-    "prop-types": "^15.7.2",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "styled-components": "^5.2.1",
-    "inputmask": "^5.0.5"
-  },
   "dependencies": {
-    "classnames": "^2.2.6",
-    "plyr": "^3.6.3",
-    "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "classnames": "^2.2.6",
+    "plyr": "^3.6.3",
     "styled-components": "^5.2.1",
     "inputmask": "^5.0.5"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.3",
+    "@types/classnames": "^2.2.3",
+    "@types/inputmask": "^5.0.0",
+    "@types/styled-components": "^5.1.9"
   }
 }

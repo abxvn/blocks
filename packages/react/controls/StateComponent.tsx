@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import React from 'react'
 
 interface StateComponentProps {
   isLoading: boolean
@@ -13,9 +13,9 @@ const StateComponent: React.FC<StateComponentProps> = ({
   const contents = isLoading ? loadingChildren : children
 
   return (
-    <Suspense fallback={loadingChildren}>
+    <React.Suspense fallback={loadingChildren}>
       {contents}
-    </Suspense>
+    </React.Suspense>
   )
 }
 

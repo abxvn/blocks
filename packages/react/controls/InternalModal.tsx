@@ -1,11 +1,11 @@
-import React, { MouseEventHandler } from 'react'
+import React from 'react'
 import classnames from 'classnames'
 import styled, { keyframes } from 'styled-components'
 
 interface InternalModalProps {
   isShown: boolean
   children: any
-  onClick?: MouseEventHandler<HTMLDivElement>
+  onClick?: React.MouseEventHandler<HTMLDivElement>
   className?: string
 }
 const InternalModal: React.FC<InternalModalProps> = (props: InternalModalProps) => {

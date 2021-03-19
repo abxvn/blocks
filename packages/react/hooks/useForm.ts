@@ -1,7 +1,10 @@
-import { useEffect, useState } from 'react'
+import React from 'react'
 import usePermaRef from './usePermaRef'
 import useChangeDetection from './useChangeDetection'
 import updateField from '../lib/updateField'
+
+// @ts-expect-error
+window.fakedReact = React
 
 interface FormOptions {
   onError?: Function
@@ -17,9 +20,9 @@ export default function useForm (form: any, data: any, { onError, onChange }: Fo
   }
 
   const formRef = usePermaRef(form)
-  const [formData, setFormData] = useState(data)
+  const [formData, setFormData] = React.useState(data)
 
-  useEffect(function onMount () {
+  React.useEffect(function onMount () {
     formRef.init(formData)
     ;(onError != null) && formRef.on('error', onError)
     ;(onChange != null) && formRef.on('change', onChange)

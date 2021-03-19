@@ -33,10 +33,10 @@
   },
   "homepage": "https://github.com/tekuasia/blocks#readme",
   "dependencies": {
-    "classnames": "^2.2.6",
-    "plyr": "^3.6.3",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "classnames": "^2.2.6",
+    "plyr": "^3.6.3",
     "styled-components": "^5.2.1",
     "inputmask": "^5.0.5"
   },

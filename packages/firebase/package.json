@@ -1,6 +1,12 @@
 {
   "name": "@teku-blocks/firebase",
-  "version": "1.0.0",
+  "version": "0.0.1-alpha",
+  "files": [
+    "README.md",
+    "LICENSE",
+    "index.js",
+    "FirestoreFilters/index.js"
+  ],
   "description": "Teku's Firebase / Firestore library",
   "repository": {
     "type": "git",

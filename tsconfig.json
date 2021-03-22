@@ -1,7 +1,6 @@
 {
   "include": [
     "./packages/"
-    ,"./alias/"
   ],
   "compilerOptions": {
     // "declaration": true,

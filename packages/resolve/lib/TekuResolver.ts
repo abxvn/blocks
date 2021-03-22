@@ -56,7 +56,7 @@ export default class TekuResolver implements ITekuResolver {
     }
   }
 
-  private async resolveFromDirectory (path: string): Promise<TekuModule> {
+  private async resolveFromDirectory (path: string): Promise<ITekuModule> {
     const { packageFile, extensions } = this.options
 
     if (!await isDirectory(path)) {
@@ -90,7 +90,7 @@ export default class TekuResolver implements ITekuResolver {
     return module
   }
 
-  private async resolveFromFile (path: string): Promise<TekuModule> {
+  private async resolveFromFile (path: string): Promise<ITekuModule> {
     const { extensions } = this.options
     const filePosibilities = [
       path,
@@ -116,7 +116,7 @@ export default class TekuResolver implements ITekuResolver {
     return module
   }
 
-  private async resolveFromNodeModules (path: string): Promise<TekuModule> {
+  private async resolveFromNodeModules (path: string): Promise<ITekuModule> {
     const nodeModulesPaths = this.nodeModulesDirs.map(d => joinPath(d, path))
     let resolvedModule: TekuModule | undefined
 

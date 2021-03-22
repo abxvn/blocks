@@ -9,12 +9,14 @@ if: ${{ !github.event.issue.pull_request }} && constrains(github.event.comment.b
 jobs:
   checkout:
     name: Setup Package
+    if: ${{ !github.event.issue.pull_request }} && constrains(github.event.comment.body, 'Release \#')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
 
   build:
     name: Build package
+    if: ${{ success() }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-node@v1
@@ -25,6 +27,7 @@ jobs:
 
   release:
     name: Release package
+    if: ${{ success() }}
     runs-on: ubuntu-latest
     steps:
       - run: echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > .npmrc
@@ -34,6 +37,7 @@ jobs:
 
   auto_move:
     name: Auto move tasks to Released
+    if: ${{ success() }}
     runs-on: ubuntu-latest
     steps:
       - uses: hungluu/move-tasks@v2

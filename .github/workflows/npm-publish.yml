@@ -1,0 +1,48 @@
+name: Publish-Package
+
+on:
+  issue_comment:
+    types: [created, edited]
+
+if: ${{ !github.event.issue.pull_request }} && constrains(github.event.comment.body, 'Release \#')
+
+jobs:
+  checkout:
+    name: Setup Package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+  build:
+    name: Build package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14
+      - run: yarn install
+      - run: yarn run build
+
+  release:
+    name: Release package
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > .npmrc
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: lerna exec --scope @teku-blocks/firebase -- npm  publish
+
+  auto_move:
+    name: Auto move tasks to Released
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hungluu/move-tasks@v2
+        with:
+          actionToken: ${{secrets.GIT_TOKEN}}
+          repository: tekuasia/blocks
+          project: orgs/tekuasia/projects/5
+          fromCards: >
+            $project
+              > columns(name is Merged)
+              > cards(contentId is ${{ github.event.issue.id }})
+          toColumn: $project > columns(name is Released)

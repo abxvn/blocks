@@ -13,10 +13,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
-      - name: Install
+      - name: Setup env
         uses: actions/setup-node@v1
         with:
           node-version: 14
+
+      - name: Install
         run: yarn install
 
       - name: Build

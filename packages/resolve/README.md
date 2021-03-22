@@ -109,9 +109,13 @@ We tested with 2 cases, to compare speed using vanilla `require.resolve` and thi
 
 **Test loading 10 packages**
 
+<img width="494" alt="Screen Shot 2021-03-23 at 00 08 01" src="https://user-images.githubusercontent.com/13363340/112029482-e1251f00-8b6b-11eb-9cf8-8074f72de6ab.png">
 
 **Test loading 80 packages**
 
+<img width="494" alt="Screen Shot 2021-03-23 at 00 07 18" src="https://user-images.githubusercontent.com/13363340/112029502-e6826980-8b6b-11eb-9e16-bd6c790d003b.png">
+
+All tests were done on my Mac intel i5 10th (2020), RAM 16 GB 
 
 Contribution
 -----

@@ -1,6 +1,5 @@
 {
   "name": "@teku/blocks",
-  "module": "es6",
   "private": true,
   "version": "1.0.0",
   "description": "Repository for building blocks of Teku applications",

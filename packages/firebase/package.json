@@ -31,5 +31,8 @@
   "devDependencies": {
     "@firebase/firestore-types": "^2.2.0"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "homepage": "https://github.com/tekuasia/blocks#readme"
 }

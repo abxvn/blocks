@@ -1,7 +1,10 @@
 {
   "include": [
-    "./packages/"
-    ,"./alias/"
+    // TODO: enable react compilation after it gets fixed
+    "./packages/firebase",
+    "./packages/form",
+    "./packages/resolve",
+    "./alias/"
   ],
   "compilerOptions": {
     // "declaration": true,

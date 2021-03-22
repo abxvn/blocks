@@ -36,7 +36,7 @@ export const isDirectory = async (path: string): Promise<boolean> => {
 
 // node modules
 export const getYarnGlobalDirPath = (): string => globalDirs.yarn.packages
-export const getNpmGlobalDirPath = (): string => globalDirs.yarn.packages
+export const getNpmGlobalDirPath = (): string => globalDirs.npm.packages
 export const getPathNodeModulesDirs = (path: string, nodeModulesDir: string): string[] => {
   let prefix = '/'
   if ((/^([A-Za-z]:)/).test(path)) {

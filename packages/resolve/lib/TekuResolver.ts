@@ -30,22 +30,22 @@ export default class TekuResolver implements ITekuResolver {
           fullPath += '/'
         }
 
-        if ((/\/$/).test(fullPath) && fullPath === baseDirPath) {
+        if (/\/$/.test(path) && fullPath !== baseDirPath) {
           if (types.includes('directory')) {
             return await this.resolveFromDirectory(fullPath)
           } else {
-            throw Error('Loading module from directory is not supported')
+            throw Error('Resolving module from directory is not supported')
           }
         } else if (types.includes('file')) {
           return await this.resolveFromFile(fullPath)
         } else {
-          throw Error('Loading module from file is not supported')
+          throw Error('Resolving module from file is not supported')
         }
       } else if (types.includes('package')) {
         // load from node_modules
         return await this.resolveFromNodeModules(path)
       } else {
-        throw Error('Loading module from node_modules is not supported')
+        throw Error('Resolving module from node_modules is not supported')
       }
     } catch (err) {
       const module = new TekuModule(path)
@@ -73,13 +73,19 @@ export default class TekuResolver implements ITekuResolver {
     const mainFilePosibilities = module.meta.main !== undefined
       ? [module.meta?.main]
       : extensions.map(ext => joinPath(path, `index.${ext}`))
-    const mainFile = await mainFilePosibilities.find(async mainFilePath => await isFile(mainFilePath))
+    let mainFile
+    for (const mainFilePath of mainFilePosibilities) {
+      if (await isFile(mainFilePath)) {
+        mainFile = mainFilePath
+        break
+      }
+    }
 
     if (mainFile === undefined) {
       throw Error(`Main file for '${path}' doesn't exists`)
     }
 
-    module.entry = mainFile
+    module.entry = resolvePath(path, mainFile)
 
     return module
   }
@@ -90,7 +96,14 @@ export default class TekuResolver implements ITekuResolver {
       path,
       ...extensions.map(ext => `${path}.${ext}`)
     ]
-    const resolvedPath = await filePosibilities.find(async filePath => await isFile(filePath))
+
+    let resolvedPath
+    for (const filePath of filePosibilities) {
+      if (await isFile(filePath)) {
+        resolvedPath = filePath
+        break
+      }
+    }
 
     if (resolvedPath === undefined) {
       throw Error(`Cannot resolve module file '${path}'`)
@@ -107,19 +120,18 @@ export default class TekuResolver implements ITekuResolver {
     const nodeModulesPaths = this.nodeModulesDirs.map(d => joinPath(d, path))
     let resolvedModule: TekuModule | undefined
 
-    await nodeModulesPaths.some(async p => {
+    for (const nodeModulesPath of nodeModulesPaths) {
       try {
-        resolvedModule = await this.resolveFromDirectory(p)
+        resolvedModule = await this.resolveFromDirectory(nodeModulesPath)
 
-        if (resolvedModule.meta.name === undefined) {
-          return false // node_modules package should have package.json file
+        // node_modules package should have package.json file
+        if (resolvedModule.meta.name !== undefined) {
+          break
         }
-
-        return true // stop loop
       } catch (err) {
-        return false
+        continue
       }
-    })
+    }
 
     if (resolvedModule === undefined) {
       throw Error(`Cannot resolve node module '${path}'`)

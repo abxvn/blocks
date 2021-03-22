@@ -25,8 +25,8 @@ const getConfig = async () => {
       filename: ({ chunk: { name } }) => {
         return name.replace('.tsx', '.js').replace('.ts', '.js') // may change index.ts to index.js
       },
-      libraryTarget: 'commonjs2',
-      libraryExport: 'default'
+      libraryTarget: 'commonjs2'
+      // libraryExport: 'default'
     },
     resolve: {
       // alias: await expandAliases(['react'], NODE_ENV), // TODO: attermpting to fix React https://github.com/tekuasia/blocks/issues/4

@@ -1,7 +1,12 @@
 {
   "name": "@teku-blocks/firebase",
-  "private": true,
-  "version": "1.0.0",
+  "version": "0.0.8-alpha",
+  "files": [
+    "README.md",
+    "LICENSE",
+    "index.js",
+    "FirestoreFilters/index.js"
+  ],
   "description": "Teku's Firebase / Firestore library",
   "repository": {
     "type": "git",
@@ -25,6 +30,9 @@
   },
   "devDependencies": {
     "@firebase/firestore-types": "^2.2.0"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "homepage": "https://github.com/tekuasia/blocks#readme"
 }

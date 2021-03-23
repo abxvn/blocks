@@ -1,6 +1,8 @@
 {
   "include": [
-    "./packages/"
+    "./packages/firebase",
+    "./packages/form",
+    "./packages/resolve"
   ],
   "compilerOptions": {
     // "declaration": true,

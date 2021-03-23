@@ -1,0 +1,42 @@
+{
+  "name": "@teku-blocks/resolve",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Teku's async resolve",
+  "files": [
+    "README.md",
+    "LICENSE",
+    "components/"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tekuasia/blocks.git",
+    "directory": "packages/resolve"
+  },
+  "keywords": [
+    "teku",
+    "building",
+    "blocks",
+    "resolve"
+  ],
+  "author": {
+    "name": "Hung Luu",
+    "email": "hungluu2106@gmail.com"
+  },
+  "dependencies": {
+    "fs-extra": "^9.1.0",
+    "global-dirs": "^3.0.0",
+    "is-core-module": "^2.2.0",
+    "fast-glob": "^3.2.5"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^9.0.8",
+    "@types/global-dirs": "^1.0.0",
+    "@types/is-core-module": "^2.2.0"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tekuasia/blocks/issues"
+  },
+  "homepage": "https://github.com/tekuasia/blocks#readme"
+}

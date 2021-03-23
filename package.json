@@ -7,7 +7,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack",
     "start": "webpack",
-    "lint": "ts-standard {src,packages}/**/*.ts",
+    "lint": "ts-standard packages/**/*.ts",
     "local": "lerna exec -- yarn link"
   },
   "repository": {

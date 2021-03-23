@@ -4,13 +4,10 @@
   "version": "1.0.0",
   "description": "Teku's form library",
   "main": "index.js",
-  "scripts": {
-    "test": "test"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tekuasia/blocks.git",
-    "directory": "form"
+    "directory": "packages/form"
   },
   "keywords": [
     "teku",

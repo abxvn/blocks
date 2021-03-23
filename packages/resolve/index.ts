@@ -34,5 +34,5 @@ export function createResolver (options?: IResolveOptions): TekuResolver {
 export default async function resolve (path: string, options?: IResolveOptions): Promise<TekuModule> {
   const resolver = createResolver(options)
 
-  return await resolver.resolve(path)
+  return path.includes('*') ? await resolver.resolveWildcard(path) : await resolver.resolve(path)
 }

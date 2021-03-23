@@ -26,7 +26,8 @@
   "dependencies": {
     "fs-extra": "^9.1.0",
     "global-dirs": "^3.0.0",
-    "is-core-module": "^2.2.0"
+    "is-core-module": "^2.2.0",
+    "fast-glob": "^3.2.5"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.8",

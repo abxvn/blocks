@@ -61,6 +61,9 @@ All options are optional (We already provided a good configuration for you):
 | extraNodeModulesPaths | string[] | Extra node_modules paths other than baseDir/node_modules (By default we support both Yarn and Npm global packages)                    | [_yarnGlobal_, _npmGlobal_]      |
 
 ### Resolves wildcard modules
+
+> For now we only support resolving wildcard from node_modules (our use cases at TekuAsia). If you need extra features please open new issue with `enhancement` label
+
 For example, to resolve all modules belonging to [`@teku`](https://teku.asia) organization
 ```js
 // {
@@ -115,7 +118,7 @@ We tested with 2 cases, to compare speed using vanilla `require.resolve` and thi
 
 <img width="494" alt="Screen Shot 2021-03-23 at 00 07 18" src="https://user-images.githubusercontent.com/13363340/112029502-e6826980-8b6b-11eb-9e16-bd6c790d003b.png">
 
-All tests were done on my Mac intel i5 10th (2020), RAM 16 GB 
+All tests were done on my Mac intel i5 10th (2020), RAM 16 GB
 
 Contribution
 -----

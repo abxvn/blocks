@@ -1,9 +1,11 @@
 import { resolve as resolvePath, join as joinPath } from 'path'
+import { readJson } from 'fs-extra'
+import glob from 'fast-glob'
 
 import { getPathNodeModulesDirs, isCoreModule, isDirectory, isFile } from './utils'
 import type { ITekuResolverOptions, ITekuModule, ITekuResolver } from './types'
-import { readJson } from 'fs-extra'
 import TekuModule from './TekuModule'
+import { FS_BASED_MODULE_REGEX, WILDCARD_MODULE_REGEX } from './config'
 
 export default class TekuResolver implements ITekuResolver {
   private readonly nodeModulesDirs: string[] = []
@@ -17,13 +19,39 @@ export default class TekuResolver implements ITekuResolver {
     ]
   }
 
+  async resolveWildcard (pattern: string): Promise<any> {
+    if (!pattern.includes('*')) {
+      throw Error('At least one glob star (*) should be in glob path')
+    }
+
+    if (!WILDCARD_MODULE_REGEX.test(pattern)) {
+      throw Error('Wildcard only supports pattern <path>/* with only 1 star at the end')
+    }
+
+    if (FS_BASED_MODULE_REGEX.test(pattern)) {
+      throw Error('Wildcard only supports loading from node_modules')
+    }
+
+    const nodeModulesPatterns = this.nodeModulesDirs.map(d => joinPath(d, pattern))
+    const nodeModulesPaths: string[] = await glob(nodeModulesPatterns, { dot: false, onlyDirectories: true })
+    const modules = await Promise.all(nodeModulesPaths.map(async p => await this.resolveFromDirectory(p)))
+    const moduleNames = modules.map(m => m.meta.name)
+
+    const result: {[key: string]: ITekuModule} = {}
+    moduleNames.forEach((name, idx) => {
+      result[name] = modules[idx]
+    })
+
+    return result
+  }
+
   async resolve (path: string): Promise<ITekuModule> {
     const { baseDirPath, types } = this.options
 
     try {
       if (isCoreModule(path)) {
         return new TekuModule(path)
-      } else if (/^(?:\.\.?(?:\/|$)|\/|([A-Za-z]:)?[/\\])/.test(path)) {
+      } else if (FS_BASED_MODULE_REGEX.test(path)) {
         // possible file or directory path
         let fullPath = resolvePath(baseDirPath, path)
         if (fullPath === '.' || fullPath === '..' || fullPath.slice(-1) === '/') {
@@ -71,7 +99,7 @@ export default class TekuResolver implements ITekuResolver {
     }
 
     const mainFilePosibilities = module.meta.main !== undefined
-      ? [module.meta?.main]
+      ? [joinPath(path, module.meta.main)]
       : extensions.map(ext => joinPath(path, `index.${ext}`))
     let mainFile
     for (const mainFilePath of mainFilePosibilities) {
@@ -81,11 +109,11 @@ export default class TekuResolver implements ITekuResolver {
       }
     }
 
-    if (mainFile === undefined) {
-      throw Error(`Main file for '${path}' doesn't exists`)
-    }
+    // if (mainFile === undefined) {
+    //   throw Error(`Main file for '${path}' doesn't exists`)
+    // }
 
-    module.entry = resolvePath(path, mainFile)
+    module.entry = mainFile === undefined ? '' : resolvePath(path, mainFile)
 
     return module
   }

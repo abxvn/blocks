@@ -32,7 +32,7 @@ export interface ITekuModule {
 export interface ITekuResolver {
   options: ITekuResolverOptions
   resolve: (path: string) => Promise<ITekuModule>
-  // resolveWildcard: (wildcardPath: string) => Promise<ITekuModule>
+  resolveWildcard: (pattern: string) => Promise<{[key: string]: ITekuModule}>
 }
 
 export interface ITekuResolverOptions {

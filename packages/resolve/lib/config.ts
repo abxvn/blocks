@@ -3,3 +3,5 @@ export const PACKAGE_FILE = 'package.json'
 export const EXTENSIONS = [
   'js'
 ]
+export const FS_BASED_MODULE_REGEX = /^(?:\.\.?(?:\/|$)|\/|([A-Za-z]:)?[/\\])/
+export const WILDCARD_MODULE_REGEX = /^[^*]+\/\*$/

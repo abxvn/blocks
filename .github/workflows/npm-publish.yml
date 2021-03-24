@@ -5,8 +5,8 @@ on:
     types: [created, edited]
 
 jobs:
-  checkout:
-    name: Setup Package
+  Publish:
+    name: Publish & move task
     if: ${{ !github.event.issue.pull_request }} && constrains(github.event.comment.body, 'Release \#')
     runs-on: ubuntu-latest
     steps:

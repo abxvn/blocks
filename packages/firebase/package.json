@@ -1,6 +1,6 @@
 {
   "name": "@teku-blocks/firebase",
-  "version": "0.0.8-alpha",
+  "version": "0.0.7-alpha",
   "files": [
     "README.md",
     "LICENSE",

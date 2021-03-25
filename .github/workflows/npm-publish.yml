@@ -26,7 +26,7 @@ jobs:
         run: yarn run build
 
       - name: Setup npm env
-        run: echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > ~/.npmrc
+        run: echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > /home/runner/work/_temp/.npmrc
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 

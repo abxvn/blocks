@@ -22,6 +22,8 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v1
       - name: Read package.json
         uses: tyankatsu0105/read-package-version-actions@v1
         id: package-version
@@ -33,8 +35,8 @@ jobs:
           issue-number: ${{ github.event.issue.number }}
           body: Publishing ${{ steps.package-version.outputs.name}}:${{ steps.package-version.outputs.version }}
 
-  build:
-    name: Build
+  publish:
+    name: Publish
     needs: setup
     runs-on: ubuntu-latest
     steps:
@@ -50,11 +52,6 @@ jobs:
       - name: Build
         run: yarn run build
 
-  publish:
-    name: Publish package
-    needs: [setup, build]
-    runs-on: ubuntu-latest
-    steps:
       - name: Setup npm env
         run: echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > /home/runner/work/_temp/.npmrc
         env:

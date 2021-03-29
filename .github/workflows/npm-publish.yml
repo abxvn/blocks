@@ -20,7 +20,7 @@ jobs:
   comment:
     name: Create comment
     needs: setup
-    run-on: ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Read package.json
         uses: tyankatsu0105/read-package-version-actions@v1

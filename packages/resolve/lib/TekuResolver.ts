@@ -24,10 +24,6 @@ export default class TekuResolver implements ITekuResolver {
       throw Error('At least one glob star (*) should be in glob path')
     }
 
-    if (!WILDCARD_MODULE_REGEX.test(pattern)) {
-      throw Error('Wildcard only supports pattern <path>/* with only 1 star at the end')
-    }
-
     if (FS_BASED_MODULE_REGEX.test(pattern)) {
       throw Error('Wildcard only supports loading from node_modules')
     }

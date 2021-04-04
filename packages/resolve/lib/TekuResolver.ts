@@ -54,11 +54,14 @@ export default class TekuResolver implements ITekuResolver {
       } else if (FS_BASED_MODULE_REGEX.test(path)) {
         // possible file or directory path
         let fullPath = resolvePath(baseDirPath, path)
-        if (fullPath === '.' || fullPath === '..' || fullPath.slice(-1) === '/') {
+        if (fullPath === '.' || fullPath === '..' || path.slice(-1) === '/') {
           fullPath += '/'
         }
 
-        if (/\/$/.test(path) && fullPath !== baseDirPath) {
+        const shouldResolveAsDirectory = fullPath !== baseDirPath &&
+          (/\/$/.test(fullPath) || await isDirectory(fullPath))
+
+        if (shouldResolveAsDirectory) {
           if (types.includes('directory')) {
             return await this.resolveFromDirectory(fullPath)
           } else {
@@ -109,9 +112,9 @@ export default class TekuResolver implements ITekuResolver {
       }
     }
 
-    // if (mainFile === undefined) {
-    //   throw Error(`Main file for '${path}' doesn't exists`)
-    // }
+    if (mainFile === undefined) {
+      throw Error(`Main file for '${path}' doesn't exists`)
+    }
 
     module.entry = mainFile === undefined ? '' : resolvePath(path, mainFile)
 

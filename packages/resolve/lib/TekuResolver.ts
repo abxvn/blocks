@@ -87,7 +87,7 @@ export default class TekuResolver implements ITekuResolver {
     }
   }
 
-  private async resolveFromDirectory (path: string): Promise<ITekuModule> {
+  private async resolveFromDirectory (path: string, moduleOnly: boolean = false): Promise<ITekuModule> {
     const { packageFile, extensions } = this.options
 
     if (!await isDirectory(path)) {
@@ -99,6 +99,8 @@ export default class TekuResolver implements ITekuResolver {
 
     if (await isFile(packageFile)) {
       module.meta = await readJson(packageFilePath)
+    } else if (moduleOnly) {
+      throw Error(`Module at ${path} doesn't have a package.json file`)
     }
 
     const mainFilePosibilities = module.meta.main !== undefined
@@ -153,12 +155,7 @@ export default class TekuResolver implements ITekuResolver {
 
     for (const nodeModulesPath of nodeModulesPaths) {
       try {
-        resolvedModule = await this.resolveFromDirectory(nodeModulesPath)
-
-        // node_modules package should have package.json file
-        if (resolvedModule.meta.name !== undefined) {
-          break
-        }
+        resolvedModule = await this.resolveFromDirectory(nodeModulesPath, true)
       } catch (err) {
         continue
       }

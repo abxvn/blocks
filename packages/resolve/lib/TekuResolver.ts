@@ -5,7 +5,7 @@ import glob from 'fast-glob'
 import { getPathNodeModulesDirs, isCoreModule, isDirectory, isFile } from './utils'
 import type { ITekuResolverOptions, ITekuModule, ITekuResolver } from './types'
 import TekuModule from './TekuModule'
-import { FS_BASED_MODULE_REGEX, WILDCARD_MODULE_REGEX } from './config'
+import { FS_BASED_MODULE_REGEX } from './config'
 
 export default class TekuResolver implements ITekuResolver {
   private readonly nodeModulesDirs: string[] = []

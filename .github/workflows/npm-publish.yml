@@ -25,7 +25,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Read package.json
-        uses: tyankatsu0105/read-package-version-actions@v1
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./packages/firebase/package.json
         id: package-version
       - name: Create comment on issue
         uses: peter-evans/create-or-update-comment@v1

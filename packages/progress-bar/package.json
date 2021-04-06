@@ -1,0 +1,33 @@
+{
+  "name": "@teku-blocks/progress-bar",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Teku's progress-bar library",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tekuasia/blocks.git",
+    "directory": "packages/progress-bar"
+  },
+  "keywords": [
+    "teku",
+    "building",
+    "blocks",
+    "progress-bar"
+  ],
+  "author": {
+    "name": "Hung Luu",
+    "email": "hungluu2106@gmail.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tekuasia/blocks/issues"
+  },
+  "homepage": "https://github.com/tekuasia/blocks#readme",
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "cli-progress": "^3.9.0",
+    "figures": "^3.2.0",
+    "lodash": "^4.17.21"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "@teku-blocks/queues",
+  "files": [
+    "README.md",
+    "LICENSE",
+    "index.js"
+  ],
+  "private": true,
+  "version": "1.0.0",
+  "description": "Teku's queues library",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tekuasia/blocks.git",
+    "directory": "packages/queues"
+  },
+  "keywords": [
+    "teku",
+    "building",
+    "blocks",
+    "queues"
+  ],
+  "author": {
+    "name": "Hung Luu",
+    "email": "hungluu2106@gmail.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tekuasia/blocks/issues"
+  },
+  "homepage": "https://github.com/tekuasia/blocks#readme"
+}

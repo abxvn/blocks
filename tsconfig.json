@@ -2,7 +2,10 @@
   "include": [
     "./packages/firebase",
     "./packages/form",
-    "./packages/resolve"
+    "./packages/resolve",
+    "./packages/pluggable",
+    "./packages/progress-bar",
+    "./packages/queues"
   ],
   "compilerOptions": {
     // "declaration": true,
@@ -20,13 +23,14 @@
     ],
     "strict": true,
     // "noEmit": true,
-    "isolatedModules": true,
+    "isolatedModules": false,
     "esModuleInterop": true,
     "noUnusedLocals": false,
     "allowJs": true,
     /* Advanced Options */
     "skipLibCheck": true,                     /* Skip type checking of declaration files. */
-    "forceConsistentCasingInFileNames": true  /* Disallow inconsistently-cased references to the same file. */
+    "forceConsistentCasingInFileNames": true,  /* Disallow inconsistently-cased references to the same file. */
+    "noImplicitAny": false
   },
   "exclude": [
     "node_modules"

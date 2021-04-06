@@ -75,7 +75,7 @@ jobs:
         with:
           actionToken: ${{ secrets.ACTION_TOKEN }}
           repository: tekuasia/blocks
-          project: tekuasia/projects/5
+          project: tekuasia/blocks
           fromCards: >
             $project
               > columns(name is In progress, Merged)

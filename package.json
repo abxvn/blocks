@@ -27,7 +27,10 @@
   "workspaces": [
     "packages/firebase",
     "packages/form",
-    "packages/resolve"
+    "packages/resolve",
+    "packages/pluggable",
+    "packages/progress-bar",
+    "packages/queues"
   ],
   "homepage": "https://github.com/tekuasia/blocks#readme",
   "devDependencies": {

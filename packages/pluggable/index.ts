@@ -6,8 +6,8 @@ export const load = async (plugins: IPlugin[], dest: IPluggable, onItem?: (plugi
   return await new Promise((resolve, reject) => {
     const loader = new PluginLoader(plugins, dest)
 
-    loader.on('done', loadedList => resolve(loadedList))
-    loader.on('error', err => reject(err))
+    loader.once('done', loadedList => resolve(loadedList))
+    loader.once('error', err => reject(err))
 
     if (onItem instanceof Function) {
       loader.on('plugin:loaded', onItem)
@@ -19,5 +19,5 @@ export const load = async (plugins: IPlugin[], dest: IPluggable, onItem?: (plugi
 }
 
 export { default as IPluggable } from './IPluggable'
-export { default as IPlugin } from './IPlugin'
-export { default as PluginLoader } from './PluginLoader'
+export type { default as IPlugin } from './IPlugin'
+export type { default as PluginLoader } from './PluginLoader'

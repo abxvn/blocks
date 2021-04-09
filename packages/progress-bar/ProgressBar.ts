@@ -1,5 +1,5 @@
 import { MultiBar, SingleBar } from 'cli-progress'
-import { times } from 'lodash'
+import { times, set, get } from 'lodash'
 import IProgressBarItem from './IProgressBarItem'
 
 /**
@@ -15,7 +15,8 @@ export default class ProgressBar {
     this.merge(data)
   }
 
-  merge (data: IProgressBarItem[]): void {
+  merge (newData: IProgressBarItem[]): void {
+    const data = newData.filter(Boolean)
     const addedCount = data.length - this.data.length
     const removedCount = this.data.length - data.length
 
@@ -37,6 +38,17 @@ export default class ProgressBar {
       bar.setTotal(total)
       bar.update(current, { title, ...other })
     })
+  }
+
+  update (path: string, value: string): void {
+    const currentValue = get(this.data, path) as string
+
+    if (currentValue !== undefined && currentValue !== value) {
+      const newData = this.data.slice()
+      set(newData, path, value)
+
+      this.merge(newData)
+    }
   }
 
   stop (): void {

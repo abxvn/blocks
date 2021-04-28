@@ -1,0 +1,22 @@
+{
+  "name": "gatsby-teku-routes",
+  "version": "1.0.0",
+  "repository": {
+    "url": "https://github.com/tekuasia/blocks",
+    "directory": "gatsby/gatsby-plugin-routes",
+    "type": "git"
+  },
+  "author": {
+    "name": "Hung Luu",
+    "email": "hungluu2106@gmail.com",
+    "url": "https://hungluu.com"
+  },
+  "homepage": "https://github.com/tekuasia/blocks/tree/main/gatsby/gatsby-plugin-routes#readme",
+  "description": "Programmatically create pages from routes configuration",
+  "keywords": ["gatsby", "gatsby-plugin", "teku", "routes"],
+  "dependencies": {
+    "kind-of": "^6.0.3",
+    "lodash": "^4.17.21"
+  },
+  "license": "MIT"
+}

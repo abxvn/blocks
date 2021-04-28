@@ -5,21 +5,19 @@ let didRunAlready = false
 let routeOptions
 
 exports.createPages = ({ actions }) => {
-  mapViews(
-    parseRoutes(require(routeOptions.configFile)),
-    routeOptions
-  ).forEach(({ uri, view, layout }) => {
-    const page = {
+  const routeDefinitions = require(routeOptions.configFile)
+  const parsedRoutes = parseRoutes(routeDefinitions, routeOptions)
+
+  mapViews(parsedRoutes, routeOptions)
+    .map(({ uri, view, layout }) => ({
       path: uri,
       matchPath: uri,
       component: view,
       context: {
         layout
       }
-    }
-
-    actions.createPage(page)
-  })
+    }))
+    .forEach(page => actions.createPage(page))
 }
 
 exports.onPreInit = ({ store }, options) => {
@@ -35,6 +33,7 @@ exports.onPreInit = ({ store }, options) => {
   routeOptions = Object.assign({
     // default values
     configFile: resolvePath(baseDir, 'src/routes.js'),
-    viewDir: resolvePath(baseDir, 'src')
+    viewDir: resolvePath(baseDir, 'src'),
+    defaultLayout: 'index'
   }, options)
 }

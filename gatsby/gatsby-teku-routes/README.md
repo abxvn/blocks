@@ -9,6 +9,21 @@ gatsby-teku-routes
 - 💡 Provides helpful APIs to access route config
 - 🌓 Supports [gatsby-plugin-layout](https://www.gatsbyjs.com/plugins/gatsby-plugin-layout/) out of the box
 
+**Table of contents**
+  * [Installation](#installation)
+  * [How To Use](#how-to-use)
+    + [Enable plugin](#enable-plugin)
+    + [Plugin options](#plugin-options)
+  * [Route definitions](#route-definitions)
+    + [Example route definitions:](#example-route-definitions)
+    + [Uri to view route](#uri-to-view-route)
+    + [Named route](#named-route)
+    + [Custom layout route](#custom-layout-route)
+  * [Reusable APIs](#reusable-apis)
+    + [parseRoute](#parseroute)
+    + [mapViews](#mapviews)
+  * [Contribution](#contribution)
+
 ## Installation
 
 ```shell

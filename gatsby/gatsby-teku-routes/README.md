@@ -62,7 +62,7 @@ The `suffix` option helps you shorten for view path declaration, so instead of h
 |---------------|----------|---------------------------------------------------------------|-----------------|
 | configFile    | `string` | Full path to routes config file                               | `src/routes.js` |
 | viewDir       | `string` | Base directory path to resolve views                          | `src`           |
-| defaultLayout | `string` | Default layout name, provide context for gatsby-plugin-routes | `'index'`       |
+| defaultLayout | `string` | Default layout name, provide context for gatsby-plugin-layout | `'index'`       |
 | suffix        | `string` | Resolved view file name suffix                                | `''`            |
 
 ## Route definitions
@@ -154,5 +154,5 @@ All contributions are welcome. Feel free to open PR or share your ideas of impro
 Thank you.
 
 [npm-url]: https://www.npmjs.com/package/gatsby-teku-routes
-[npm-downloads-badge]: https://img.shields.io/npm/dw/gatsby-teku-routes
+[npm-downloads-badge]: https://badgen.net/npm/dw/gatsby-teku-routes
 [npm-version-badge]: https://badge.fury.io/js/gatsby-teku-routes.svg

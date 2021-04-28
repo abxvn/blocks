@@ -1,59 +1,40 @@
-const kindOf = require('kind-of')
-const get = require('lodash/get')
-const map = require('lodash/map')
-const filter = require('lodash/filter')
+const { parseRoutes, mapViews } = require('.')
+const { resolve: resolvePath } = require('path')
 
-const ensureFirstSlash = str => '/' + str.replace(/^\/+/, '')
-const parseRoute = (route, importUri, defaultLayout = 'index') => {
-  if (!importUri) {
-    throw TypeError('Invalid route config, please provide uri')
-  }
+let didRunAlready = false
+let routeOptions
 
-  let view
-  let layout
-  let exportUri = importUri
-  switch (kindOf(route)) {
-    // user: 'components/User'
-    case 'string':
-      return {
-        uri: ensureFirstSlash(exportUri),
-        layout: defaultLayout,
-        view: route
+exports.createPages = ({ actions }) => {
+  mapViews(
+    parseRoutes(require(routeOptions.configFile)),
+    routeOptions
+  ).forEach(({ uri, view, layout }) => {
+    const page = {
+      path: uri,
+      matchPath: uri,
+      component: view,
+      context: {
+        layout
       }
-    case 'object':
-      // user: { view: 'components/User' }
-      // user: { }
-      view = get(route, 'view')
-      layout = get(route, 'layout', defaultLayout)
-      // for named route, the importUri is route name rather than real uri
-      exportUri = get(route, 'uri', importUri)
+    }
 
-      if (kindOf(view) !== 'string' && kindOf(view) !== 'undefined') {
-        throw TypeError(`Invalid route '${importUri}' view, file path string or undefined expected`)
-      } else {
-        return {
-          uri: ensureFirstSlash(exportUri),
-          layout,
-          view
-        }
-      }
-    default:
-      throw TypeError(`Invalid route '${importUri}', only view path or route object accepted`)
-  }
+    actions.createPage(page)
+  })
 }
 
-const parseRoutes = (routeDefinitions, { defaultLayout } = {}) =>
-  map(routeDefinitions, (route, uri) => parseRoute(route, uri, defaultLayout))
-    .filter(Boolean)
-const mapViews = (parsedRoutes, { viewDir, suffix }) => {
-  const routeWithViews = filter(parsedRoutes, ({ view }) => kindOf(view) === 'string')
-  const resolveView = name => require.resolve(`${viewDir}/${name}${suffix || ''}`)
+exports.onPreInit = ({ store }, options) => {
+  if (didRunAlready) {
+    throw new Error(
+      'You can only have single instance of gatsby-plugin-layout in your gatsby-config.js'
+    )
+  }
 
-  return map(routeWithViews, route => Object.assign(route, {
-    view: resolveView(route.view)
-  }))
+  const baseDir = store.getState().program.directory
+
+  didRunAlready = true
+  routeOptions = Object.assign({
+    // default values
+    configFile: resolvePath(baseDir, 'src/routes.js'),
+    viewDir: resolvePath(baseDir, 'src')
+  }, options)
 }
-
-exports.parseRoute = parseRoute
-exports.parseRoutes = parseRoutes
-exports.mapViews = mapViews

@@ -1,24 +1,24 @@
 {
-  "name": "@teku-blocks/firebase",
-  "version": "0.0.11-alpha",
+  "name": "@teku-blocks/queues",
   "files": [
     "README.md",
     "LICENSE",
-    "index.js",
-    "FirestoreFilters/index.js"
+    "index.js"
   ],
-  "description": "Teku's Firebase / Firestore library",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Teku's queues library",
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tekuasia/blocks.git",
-    "directory": "packages/firebase"
+    "directory": "packages/queues"
   },
   "keywords": [
     "teku",
     "building",
     "blocks",
-    "firebase",
-    "firestore"
+    "queues"
   ],
   "author": {
     "name": "Hung Luu",
@@ -27,12 +27,6 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/tekuasia/blocks/issues"
-  },
-  "devDependencies": {
-    "@firebase/firestore-types": "^2.2.0"
-  },
-  "publishConfig": {
-    "access": "public"
   },
   "homepage": "https://github.com/tekuasia/blocks#readme"
 }

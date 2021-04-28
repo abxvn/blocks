@@ -14,7 +14,10 @@ const getConfig = async () => {
     entry: {
       ...await expandEntries('packages/form'),
       ...await expandEntries('packages/firebase'),
-      ...await expandEntries('packages/resolve')
+      ...await expandEntries('packages/resolve'),
+      ...await expandEntries('packages/pluggable'),
+      ...await expandEntries('packages/progress-bar'),
+      ...await expandEntries('packages/queues')
       // TODO: Enable react components compilation after getting setup fixed
       // ...await expandEntries('packages/react/controls', '**/*.tsx')
     },

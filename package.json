@@ -7,8 +7,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack",
     "start": "webpack",
-    "lint": "ts-standard packages/**/*.ts",
-    "local": "lerna exec -- yarn link"
+    "lint": "ts-standard packages/**/*.ts"
   },
   "repository": {
     "type": "git",
@@ -26,7 +25,12 @@
     "url": "https://github.com/tekuasia/blocks/issues"
   },
   "workspaces": [
-    "packages/*"
+    "packages/firebase",
+    "packages/form",
+    "packages/resolve",
+    "packages/pluggable",
+    "packages/progress-bar",
+    "packages/queues"
   ],
   "homepage": "https://github.com/tekuasia/blocks#readme",
   "devDependencies": {
@@ -39,7 +43,6 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-react": "^7.22.0",
     "fs-extra": "^9.1.0",
-    "lerna": "^3.22.1",
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
     "ts-loader": "^8.0.18",

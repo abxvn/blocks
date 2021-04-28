@@ -5,7 +5,7 @@ import glob from 'fast-glob'
 import { getPathNodeModulesDirs, isCoreModule, isDirectory, isFile } from './utils'
 import type { ITekuResolverOptions, ITekuModule, ITekuResolver } from './types'
 import TekuModule from './TekuModule'
-import { FS_BASED_MODULE_REGEX, WILDCARD_MODULE_REGEX } from './config'
+import { FS_BASED_MODULE_REGEX } from './config'
 
 export default class TekuResolver implements ITekuResolver {
   private readonly nodeModulesDirs: string[] = []
@@ -22,10 +22,6 @@ export default class TekuResolver implements ITekuResolver {
   async resolveWildcard (pattern: string): Promise<any> {
     if (!pattern.includes('*')) {
       throw Error('At least one glob star (*) should be in glob path')
-    }
-
-    if (!WILDCARD_MODULE_REGEX.test(pattern)) {
-      throw Error('Wildcard only supports pattern <path>/* with only 1 star at the end')
     }
 
     if (FS_BASED_MODULE_REGEX.test(pattern)) {
@@ -54,11 +50,14 @@ export default class TekuResolver implements ITekuResolver {
       } else if (FS_BASED_MODULE_REGEX.test(path)) {
         // possible file or directory path
         let fullPath = resolvePath(baseDirPath, path)
-        if (fullPath === '.' || fullPath === '..' || fullPath.slice(-1) === '/') {
+        if (fullPath === '.' || fullPath === '..' || path.slice(-1) === '/') {
           fullPath += '/'
         }
 
-        if (/\/$/.test(path) && fullPath !== baseDirPath) {
+        const shouldResolveAsDirectory = fullPath !== baseDirPath &&
+          (/\/$/.test(fullPath) || await isDirectory(fullPath))
+
+        if (shouldResolveAsDirectory) {
           if (types.includes('directory')) {
             return await this.resolveFromDirectory(fullPath)
           } else {
@@ -84,7 +83,7 @@ export default class TekuResolver implements ITekuResolver {
     }
   }
 
-  private async resolveFromDirectory (path: string): Promise<ITekuModule> {
+  private async resolveFromDirectory (path: string, moduleOnly: boolean = false): Promise<ITekuModule> {
     const { packageFile, extensions } = this.options
 
     if (!await isDirectory(path)) {
@@ -96,6 +95,8 @@ export default class TekuResolver implements ITekuResolver {
 
     if (await isFile(packageFile)) {
       module.meta = await readJson(packageFilePath)
+    } else if (moduleOnly) {
+      throw Error(`Module at ${path} doesn't have a package.json file`)
     }
 
     const mainFilePosibilities = module.meta.main !== undefined
@@ -109,9 +110,9 @@ export default class TekuResolver implements ITekuResolver {
       }
     }
 
-    // if (mainFile === undefined) {
-    //   throw Error(`Main file for '${path}' doesn't exists`)
-    // }
+    if (mainFile === undefined) {
+      throw Error(`Main file for '${path}' doesn't exists`)
+    }
 
     module.entry = mainFile === undefined ? '' : resolvePath(path, mainFile)
 
@@ -150,12 +151,7 @@ export default class TekuResolver implements ITekuResolver {
 
     for (const nodeModulesPath of nodeModulesPaths) {
       try {
-        resolvedModule = await this.resolveFromDirectory(nodeModulesPath)
-
-        // node_modules package should have package.json file
-        if (resolvedModule.meta.name !== undefined) {
-          break
-        }
+        resolvedModule = await this.resolveFromDirectory(nodeModulesPath, true)
       } catch (err) {
         continue
       }

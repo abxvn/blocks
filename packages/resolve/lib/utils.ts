@@ -45,15 +45,15 @@ export const getPathNodeModulesDirs = (path: string, nodeModulesDir: string): st
     prefix = '\\\\'
   }
 
-  const paths = [path]
+  const dirs = [path]
   let parsed = parse(path)
   // Go up
-  while (parsed.dir !== paths[paths.length - 1]) {
-    paths.push(parsed.dir)
+  while (parsed.dir !== dirs[dirs.length - 1]) {
+    dirs.push(parsed.dir)
     parsed = parse(parsed.dir)
   }
 
-  return paths.map(p => resolvePath(prefix, p, nodeModulesDir))
+  return dirs.map(subDir => resolvePath(prefix, subDir, nodeModulesDir))
 }
 
 // others

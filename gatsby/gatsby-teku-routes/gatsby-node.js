@@ -9,15 +9,15 @@ exports.createPages = ({ actions }) => {
   const parsedRoutes = parseRoutes(routeDefinitions, routeOptions)
 
   mapViews(parsedRoutes, routeOptions)
-    .map(({ uri, view, layout }) => ({
+    .map(({ uri, view, layout }) => Object.assign({
       path: uri,
       matchPath: uri,
       component: view,
-      context: {
-        layout
-      }
+      layout
     }))
-    .forEach(page => actions.createPage(page))
+    .forEach(page => {
+      actions.createPage(page)
+    })
 }
 
 exports.onPreInit = ({ store }, options) => {

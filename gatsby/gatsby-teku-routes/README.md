@@ -120,11 +120,36 @@ authCallback: {
 
 This plugin supports `gatsby-plugin-layout` out of the box, and the default layout is `index`. You can customize it per route using route config object:
 
-Use `list` layout instead of `index`
+**Use `list` layout instead of `index`**
 ```
 '/users': {
   view: 'users/List',
   layout: 'list'
+}
+```
+
+**Without any layouts at all**
+```
+'/user-custom': {
+  view: 'users/custom',
+  layout: ''
+}
+```
+
+In order to fully archive page render without any layouts, you may config it in your  layout index file, for example the [default layout file](https://www.gatsbyjs.com/plugins/gatsby-plugin-layout/#how-to-use):
+
+```javascript
+// src/layouts/index.js
+const Layout= (props) => {
+  const { children, pageContext } = props
+
+  switch (pageContext.layout) {
+    case '':
+      // Disable layout
+      return children
+    default:
+      return <Layout>{children}</Layout>
+  }
 }
 ```
 
@@ -154,5 +179,5 @@ All contributions are welcome. Feel free to open PR or share your ideas of impro
 Thank you.
 
 [npm-url]: https://www.npmjs.com/package/gatsby-teku-routes
-[npm-downloads-badge]: https://badgen.net/npm/dw/gatsby-teku-routes
+[npm-downloads-badge]: https://img.shields.io/npm/dw/gatsby-teku-routes
 [npm-version-badge]: https://badge.fury.io/js/gatsby-teku-routes.svg

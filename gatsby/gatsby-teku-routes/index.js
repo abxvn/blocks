@@ -12,12 +12,14 @@ const parseRoute = (route, importUri, defaultLayout = 'index') => {
   let view
   let layout
   let exportUri = importUri
+  let context
   switch (kindOf(route)) {
     // user: 'components/User'
     case 'string':
       return {
         uri: ensureFirstSlash(exportUri),
         layout: defaultLayout,
+        context: {},
         view: route
       }
     case 'object':
@@ -27,15 +29,21 @@ const parseRoute = (route, importUri, defaultLayout = 'index') => {
       layout = get(route, 'layout', defaultLayout)
       // for named route, the importUri is route name rather than real uri
       exportUri = get(route, 'uri', importUri)
+      context = get(route, 'context', {})
+
+      if (kindOf(context) !== 'object') {
+        throw TypeError(`Invalid route '${importUri}' context, object expected`)
+      }
 
       if (kindOf(view) !== 'string' && kindOf(view) !== 'undefined') {
         throw TypeError(`Invalid route '${importUri}' view, file path string or undefined expected`)
-      } else {
-        return {
-          uri: ensureFirstSlash(exportUri),
-          layout,
-          view
-        }
+      }
+
+      return {
+        uri: ensureFirstSlash(exportUri),
+        layout,
+        context,
+        view
       }
     default:
       throw TypeError(`Invalid route '${importUri}', only view path or route object accepted`)

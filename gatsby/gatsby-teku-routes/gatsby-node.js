@@ -51,7 +51,10 @@ exports.onPreInit = async ({ store }, options) => {
     )
   }
 
-  if (options.watch) {
+  const command = program._[0]
+
+  // Activate watch mode only during development
+  if (command === 'develop' && options.watch) {
     if (!process.env.ENABLE_GATSBY_REFRESH_ENDPOINT) {
       throw new Error(
         'To use watch mode, gatsby command should be run with ENABLE_GATSBY_REFRESH_ENDPOINT enabled'

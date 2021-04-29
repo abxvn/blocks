@@ -7,7 +7,7 @@ Programmatically create pages and routes from configuration.
 
 **Features**
 - 📦 Designed to be highly reusable between build time and run time, any application parts
-- 👀 Watch mode
+- 👀 Watch mode during development
 - 🌓 Supports [gatsby-plugin-layout](https://www.gatsbyjs.com/plugins/gatsby-plugin-layout/) out of the box
 - 🧾 Supports [addtional page context](#additional-context-data) per route
 - 💡 Provides helpful APIs to access route config
@@ -150,8 +150,8 @@ In order to fully archive page render without any layouts, you will need to cond
 
 ```javascript
 // src/layouts/index.js
-const Layout= ({ pageContext, children }) => {
-  return pageContext.layout !== ''
+const Layout = ({ pageContext, children }) => {
+  return pageContext.layout
     ? <DefaultLayout>{children}</DefaultLayout>
     : children
 }
@@ -181,12 +181,12 @@ For example, in combination with other plugins (like [`gatsby-plugin-next-seo`](
 ```javascript
 // src/layouts/index.js
 import { GatsbySeo } from 'gatsby-plugin-next-seo'
-const Layout= ({ pageContext, children }) => {
+const Layout = ({ pageContext, children }) => {
   const seo = get(pageContext, 'seo', {})
 
   return <>
     <GatsbySeo {...seo} />
-    {pageContext.layout !== ''
+    {pageContext.layout
       ? <DefaultLayout>{children}</DefaultLayout>
       : children}
   </>
@@ -195,7 +195,7 @@ const Layout= ({ pageContext, children }) => {
 
 ## Watch mode
 
-This plugin can request page and context rebuild everytime route definitions change by enabling `watch` option:
+During [development](https://www.gatsbyjs.com/docs/reference/gatsby-cli/#develop), this plugin can request page and context rebuild everytime route definitions change by enabling `watch` option:
 
 ```javascript
 {

@@ -1,6 +1,6 @@
 {
   "name": "gatsby-teku-routes",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "repository": {
     "url": "https://github.com/tekuasia/blocks",
     "directory": "gatsby/gatsby-plugin-routes",

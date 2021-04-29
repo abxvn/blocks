@@ -9,11 +9,10 @@ exports.createPages = ({ actions }) => {
   const parsedRoutes = parseRoutes(routeDefinitions, routeOptions)
 
   mapViews(parsedRoutes, routeOptions)
-    .map(({ uri, view, layout, context }) => Object.assign({
+    .map(({ uri, view, layout, context }) => ({
       path: uri,
       matchPath: uri,
       component: view,
-      layout,
       context: Object.assign(context, layout && {
         layout
       })

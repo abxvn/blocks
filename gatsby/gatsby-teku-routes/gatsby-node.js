@@ -58,14 +58,15 @@ exports.onPreInit = async ({ store }, options) => {
       )
     }
 
+    const shortenConfigFile = configFile.replace(directory, '')
     const cacheRefreshURL = `${https ? 'https' : 'http'}://${host}:${port}/__refresh`
     const watcher = chokidar.watch(configFile, {
       persistent: true
     })
 
-    watcher.once('ready', () => console.info(`[teku-routes] Watching route definitions at ${configFile}`))
+    watcher.once('ready', () => console.info(`[teku-routes] Watching route definitions at ${shortenConfigFile}`))
     watcher.on('change', () => {
-      console.info(`[teku-routes] Route definitions changes detected, rebuilding ...`))
+      console.info(`[teku-routes] Route definitions changes detected, rebuilding ...`)
       // Invalidate route config by deleting its cache
       delete require.cache[configFile]
 
@@ -76,7 +77,7 @@ exports.onPreInit = async ({ store }, options) => {
         })
     })
     watcher.on('error', err => {
-      console.error(`[teku-routes] Error while watching route definitions at ${configFile}`)
+      console.error(`[teku-routes] Error while watching route definitions at ${shortenConfigFile}`)
       console.error(err)
     })
   }

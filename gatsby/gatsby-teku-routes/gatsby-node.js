@@ -22,7 +22,6 @@ exports.createPages = ({ actions }) => {
       })
     }))
     .forEach(page => {
-      console.log(page)
       actions.createPage(page)
     })
 }
@@ -64,19 +63,20 @@ exports.onPreInit = async ({ store }, options) => {
       persistent: true
     })
 
-    watcher.once('ready', () => console.info(`routes: Watching route definitions at ${configFile}`))
+    watcher.once('ready', () => console.info(`[teku-routes] Watching route definitions at ${configFile}`))
     watcher.on('change', () => {
+      console.info(`[teku-routes] Route definitions changes detected, rebuilding ...`))
       // Invalidate route config by deleting its cache
       delete require.cache[configFile]
 
       axios.post(cacheRefreshURL)
         .catch(err => {
-          console.info(`routes: Cannot refresh cache on route definition changes`)
+          console.error(`[teku-routes] Cannot refresh cache on route definition changes`)
           console.error(err)
         })
     })
     watcher.on('error', err => {
-      console.info(`routes: Error while watching route definitions at ${configFile}`)
+      console.error(`[teku-routes] Error while watching route definitions at ${configFile}`)
       console.error(err)
     })
   }

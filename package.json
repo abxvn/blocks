@@ -25,6 +25,7 @@
     "url": "https://github.com/tekuasia/blocks/issues"
   },
   "workspaces": [
+    "gatsby/gatsby-teku-routes",
     "packages/firebase",
     "packages/form",
     "packages/resolve",

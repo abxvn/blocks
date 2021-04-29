@@ -3,11 +3,15 @@ gatsby-teku-routes
 [![gatsby-teku-routes version][npm-version-badge]][npm-url]
 [![gatsby-teku-routes downloads per months][npm-downloads-badge]][npm-url]
 
-- 🏭 A part of `teku` [Building Blocks](https://github.com/tekuasia/blocks) project
-- 🚀 Programmatically create pages and routes from configuration
-- 📦 Designed to be highly reusable between build time and run time, between any application parts
-- 💡 Provides helpful APIs to access route config
+Programmatically create pages and routes from configuration.
+
+**Features**
+- 📦 Designed to be highly reusable between build time and run time, any application parts
+- 👀 Watch mode
 - 🌓 Supports [gatsby-plugin-layout](https://www.gatsbyjs.com/plugins/gatsby-plugin-layout/) out of the box
+- 🧾 Supports [addtional page context](#additional-context-data) per route
+- 💡 Provides helpful APIs to access route config
+- 🏭 A part of `teku` [Building Blocks](https://github.com/tekuasia/blocks) project
 
 **Table of contents**
   * [Installation](#installation)
@@ -19,6 +23,8 @@ gatsby-teku-routes
     + [Uri to view route](#uri-to-view-route)
     + [Named route](#named-route)
     + [Custom layout route](#custom-layout-route)
+    + [Additional context data](#additional-context-data)
+  * [Watch mode](#watch-mode)
   * [Reusable APIs](#reusable-apis)
     + [parseRoute](#parseroute)
     + [mapViews](#mapviews)
@@ -70,14 +76,13 @@ The `suffix` option helps you shorten for view path declaration, so instead of h
 ### Example route definitions:
 
 ```javascript
-module.exports = {
+const routes = {
   // 1. Uri to view route
   '/': 'landing/Index',
 
   // 2. Named route
   auth: {
-    // Real uri
-    uri: '_auth',
+    uri: '_auth', // real uri
     view: 'auth/Callback'
   },
 
@@ -88,6 +93,11 @@ module.exports = {
   }
 }
 
+// 4. Conditional route
+// This route is only available during development
+process.env.NODE_ENV === 'development' && routes['/dev'] = 'dev/DevDashboard'
+
+module.exports = routes
 ```
 
 ### Uri to view route
@@ -120,7 +130,7 @@ authCallback: {
 
 This plugin supports `gatsby-plugin-layout` out of the box, and the default layout is `index`. You can customize it per route using route config object:
 
-**Use `list` layout instead of `index`**
+**Example 1: Use `list` layout instead of `index`**
 ```
 '/users': {
   view: 'users/List',
@@ -128,7 +138,7 @@ This plugin supports `gatsby-plugin-layout` out of the box, and the default layo
 }
 ```
 
-**Without any layouts at all**
+**Example 2: Without any layouts at all**
 ```
 '/user-custom': {
   view: 'users/custom',
@@ -136,22 +146,67 @@ This plugin supports `gatsby-plugin-layout` out of the box, and the default layo
 }
 ```
 
-In order to fully archive page render without any layouts, you may config it in your  layout index file, for example the [default layout file](https://www.gatsbyjs.com/plugins/gatsby-plugin-layout/#how-to-use):
+In order to fully archive page render without any layouts, you will need to conditionally render it in your layout file, for example the [default layout file](https://www.gatsbyjs.com/plugins/gatsby-plugin-layout/#how-to-use):
 
 ```javascript
 // src/layouts/index.js
-const Layout= (props) => {
-  const { children, pageContext } = props
+const Layout= ({ pageContext, children }) => {
+  return pageContext.layout !== ''
+    ? <DefaultLayout>{children}</DefaultLayout>
+    : children
+}
+```
 
-  switch (pageContext.layout) {
-    case '':
-      // Disable layout
-      return children
-    default:
-      return <Layout>{children}</Layout>
+### Additional context data
+
+This plugin allows passing addtional pageContext data into each route definition, for example:
+
+```javascript
+{
+  '/': {
+  view: 'landing/Index',
+    context: {
+      seo: {
+        title: 'Index Page'
+      }
+    }
   }
 }
 ```
+
+This will especially be useful when you need special context for some routes.
+
+For example, in combination with other plugins (like [`gatsby-plugin-next-seo`](https://www.gatsbyjs.com/plugins/gatsby-plugin-next-seo/)):
+
+```javascript
+// src/layouts/index.js
+import { GatsbySeo } from 'gatsby-plugin-next-seo'
+const Layout= ({ pageContext, children }) => {
+  const seo = get(pageContext, 'seo', {})
+
+  return <>
+    <GatsbySeo {...seo} />
+    {pageContext.layout !== ''
+      ? <DefaultLayout>{children}</DefaultLayout>
+      : children}
+  </>
+}
+```
+
+## Watch mode
+
+This plugin can request page and context rebuild everytime route definitions change by enabling `watch` option:
+
+```javascript
+{
+  resolve: 'gatsby-teku-routes',
+  options: {
+    watch: true
+  }
+}
+```
+
+Watch mode requires [ENABLE_GATSBY_REFRESH_ENDPOINT](https://www.gatsbyjs.com/docs/refreshing-content/) to be enabled.
 
 ## Reusable APIs
 

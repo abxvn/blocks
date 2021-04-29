@@ -1,14 +1,18 @@
 const { parseRoutes, mapViews } = require('.')
 const { resolve: resolvePath } = require('path')
+const fs = require('fs-extra')
+const chokidar = require('chokidar')
+const axios = require('axios')
 
 let didRunAlready = false
-let routeOptions
+let pluginOptions
 
 exports.createPages = ({ actions }) => {
-  const routeDefinitions = require(routeOptions.configFile)
-  const parsedRoutes = parseRoutes(routeDefinitions, routeOptions)
+  const { configFile } = pluginOptions
+  const routeDefinitions = require(configFile)
+  const parsedRoutes = parseRoutes(routeDefinitions, pluginOptions)
 
-  mapViews(parsedRoutes, routeOptions)
+  mapViews(parsedRoutes, pluginOptions)
     .map(({ uri, view, layout, context }) => ({
       path: uri,
       matchPath: uri,
@@ -18,24 +22,62 @@ exports.createPages = ({ actions }) => {
       })
     }))
     .forEach(page => {
+      console.log(page)
       actions.createPage(page)
     })
 }
 
-exports.onPreInit = ({ store }, options) => {
+exports.onPreInit = async ({ store }, options) => {
   if (didRunAlready) {
     throw new Error(
-      'You can only have single instance of gatsby-plugin-layout in your gatsby-config.js'
+      'Please only define one instance of gatsby-teku-routes in your gatsby-config.js'
     )
   }
 
-  const baseDir = store.getState().program.directory
+  const program = store.getState().program
+  const { directory, host, https, p: port } = program
 
   didRunAlready = true
-  routeOptions = Object.assign({
+  pluginOptions = Object.assign({
     // default values
-    configFile: resolvePath(baseDir, 'src/routes.js'),
-    viewDir: resolvePath(baseDir, 'src'),
+    configFile: resolvePath(directory, 'src/routes.js'),
+    viewDir: resolvePath(directory, 'src'),
     defaultLayout: 'index'
   }, options)
+
+  const configFile = pluginOptions.configFile
+  if (!await fs.exists(configFile)) {
+    throw Error(
+      `Route definition file not found at ${configFile}`
+    )
+  }
+
+  if (options.watch) {
+    if (!process.env.ENABLE_GATSBY_REFRESH_ENDPOINT) {
+      throw new Error(
+        'To use watch mode, gatsby command should be run with ENABLE_GATSBY_REFRESH_ENDPOINT enabled'
+      )
+    }
+
+    const cacheRefreshURL = `${https ? 'https' : 'http'}://${host}:${port}/__refresh`
+    const watcher = chokidar.watch(configFile, {
+      persistent: true
+    })
+
+    watcher.once('ready', () => console.info(`routes: Watching route definitions at ${configFile}`))
+    watcher.on('change', () => {
+      // Invalidate route config by deleting its cache
+      delete require.cache[configFile]
+
+      axios.post(cacheRefreshURL)
+        .catch(err => {
+          console.info(`routes: Cannot refresh cache on route definition changes`)
+          console.error(err)
+        })
+    })
+    watcher.on('error', err => {
+      console.info(`routes: Error while watching route definitions at ${configFile}`)
+      console.error(err)
+    })
+  }
 }

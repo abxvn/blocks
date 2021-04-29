@@ -15,6 +15,9 @@
   "description": "Programmatically create pages from routes configuration",
   "keywords": ["gatsby", "gatsby-plugin", "teku", "routes"],
   "dependencies": {
+    "axios": "^0.21.1",
+    "chokidar": "^3.5.1",
+    "fs-extra": "^9.1.0",
     "kind-of": "^6.0.3",
     "lodash": "^4.17.21"
   },

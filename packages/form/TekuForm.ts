@@ -156,6 +156,7 @@ export default class TekuForm extends EventEmitter implements ITekuForm {
 
     if (is('string', rule)) {
       const ruleString: string = rule as string
+
       // for example, rule is in:1,10 or maxLength:30
       if (RULE_PARAMS_REGEX.test(ruleString)) {
         [name, ...params] = ruleString.split(/[:,]/)

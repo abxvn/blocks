@@ -43,6 +43,7 @@ export default class FirestoreCollectionService implements IFirestoreCollectionS
 
   watchById (path: string, next: Function): void {
     const docRef = this.getDocRef(path)
+
     docRef.onSnapshot((doc: any) => {
       next(this.applyOutputFilters(doc))
     })

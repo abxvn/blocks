@@ -45,6 +45,7 @@ export default class ProgressBar {
 
     if (currentValue !== undefined && currentValue !== value) {
       const newData = this.data.slice()
+
       set(newData, path, value)
 
       this.merge(newData)

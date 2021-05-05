@@ -108,3 +108,5 @@ packages/**/index.js
 packages/**/*.d.ts
 packages/**/*.d.ts.map
 packages/react/controls/**/*.js
+temp/**/index.js
+temp/react/controls/**/*.js

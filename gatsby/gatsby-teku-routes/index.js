@@ -13,6 +13,7 @@ const parseRoute = (route, importUri, defaultLayout = 'index') => {
   let layout
   let exportUri = importUri
   let context
+
   switch (kindOf(route)) {
     // user: 'components/User'
     case 'string':

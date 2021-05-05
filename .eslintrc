@@ -27,7 +27,9 @@
       { "blankLine": "any", "prev": "const", "next": "const" },
       { "blankLine": "any", "prev": "const", "next": "let" },
       { "blankLine": "always", "prev": "*", "next": "return" }
-    ]
+    ],
+    "react/prop-types": "off", // Disable prop-types as we use TypeScript for type checking
+    "@typescript-eslint/explicit-function-return-type": "off"
   },
   "overrides": [
     {

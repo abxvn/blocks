@@ -11,22 +11,17 @@ const {
 
 const getConfig = async () => {
   return {
-    entry: {
-      ...await expandEntries('packages/form'),
-      ...await expandEntries('packages/firebase'),
-      ...await expandEntries('packages/resolve'),
-      ...await expandEntries('packages/pluggable'),
-      ...await expandEntries('packages/progress-bar'),
-      ...await expandEntries('packages/queues')
+    entry: Object.assign(
+      await expandEntries('packages/*')
       // TODO: Enable react components compilation after getting setup fixed
       // ...await expandEntries('packages/react/controls', '**/*.tsx')
-    },
+    ),
     mode: NODE_ENV,
     target: 'node',
     output: {
       path: resolve(__dirname),
       filename: ({ chunk: { name } }) => {
-        return name.replace('.tsx', '.js').replace('.ts', '.js') // may change index.ts to index.js
+        return name.replace(/\.tsx?$/, '.js') // may change index.ts to index.js
       },
       libraryTarget: 'commonjs2'
       // libraryExport: 'default'
@@ -35,8 +30,8 @@ const getConfig = async () => {
       // alias: await expandAliases(['react'], NODE_ENV), // TODO: attermpting to fix React https://github.com/tekuasia/blocks/issues/4
       extensions: [
         '.ts',
-        '.js'
-        // '.tsx' // TODO: temporarily disable loading of tsx files
+        '.js',
+        '.tsx'
       ]
     },
     module: {

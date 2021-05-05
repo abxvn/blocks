@@ -48,11 +48,5 @@
     "webpack": "^5.25.1",
     "webpack-cli": "^4.5.0",
     "webpack-node-externals": "^2.5.2"
-  },
-  "ts-standard": {
-    "ignore": [
-      "packages/**/node_modules/**/*.js",
-      "packages/react/**/*.js"
-    ]
   }
 }

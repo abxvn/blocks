@@ -80,6 +80,7 @@ export default class TaskManager extends EventEmitter {
     }
 
     const hasUncompletedDependencies = task.dependencies.some(id => !this.successfulTasks.includes(id))
+
     if (hasUncompletedDependencies) {
       return false
     }

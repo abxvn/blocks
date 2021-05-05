@@ -45,6 +45,7 @@ exports.onPreInit = async ({ store }, options) => {
   }, options)
 
   const configFile = pluginOptions.configFile
+
   if (!await fs.exists(configFile)) {
     throw Error(
       `Route definition file not found at ${configFile}`
@@ -69,13 +70,13 @@ exports.onPreInit = async ({ store }, options) => {
 
     watcher.once('ready', () => console.info(`[teku-routes] Watching route definitions at ${shortenConfigFile}`))
     watcher.on('change', () => {
-      console.info(`[teku-routes] Route definitions changes detected, rebuilding ...`)
+      console.info('[teku-routes] Route definitions changes detected, rebuilding ...')
       // Invalidate route config by deleting its cache
       delete require.cache[configFile]
 
       axios.post(cacheRefreshURL)
         .catch(err => {
-          console.error(`[teku-routes] Cannot refresh cache on route definition changes`)
+          console.error('[teku-routes] Cannot refresh cache on route definition changes')
           console.error(err)
         })
     })

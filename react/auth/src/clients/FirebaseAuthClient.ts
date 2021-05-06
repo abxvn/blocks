@@ -4,27 +4,30 @@ import IAuthClient from './IAuthClient'
 import get from 'lodash-es/get'
 
 export interface FirebaseAuthClientOptions {
-  firebase: any
-  firebaseAuth: any
+  functions?: any
+  customTokenMap: any
+  auth: any
   onAuthStateChanged: (user: any) => void
 }
 
 export default class FirebaseAuthClient extends EventEmitter implements IAuthClient {
   readonly driverId = AuthDrivers.FIREBASE_AUTH
-  private readonly firebase: any
+
+  private readonly options: any
+  private readonly functions: any
   private readonly client: any
 
   constructor (options: FirebaseAuthClientOptions) {
     super()
 
-    const { firebase, firebaseAuth, onAuthStateChanged } = options
+    const { auth, onAuthStateChanged, functions, ...otherOptions } = options
 
-    if ([firebase, firebaseAuth, onAuthStateChanged].some(e => e === undefined)) {
-      throw TypeError("FirebaseAuthClient requires 'firebase', 'firebaseAuth' client and 'onAuthStateChanged' callback")
+    this.options = otherOptions
+    if ([auth, onAuthStateChanged].some(e => e === undefined)) {
+      throw TypeError("FirebaseAuthClient requires 'auth' client and 'onAuthStateChanged' callback")
     }
 
-    this.firebase = firebase
-    this.client = firebaseAuth
+    this.client = auth
     this.on('logout', () => this.onLogout())
     this.on('login:token', token => {
       // Function handles errors internally and send to error event
@@ -66,14 +69,21 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
 
   async _loginWithCustomToken (token: string): Promise<void> {
     try {
-      const exchangeToken = this.firebase.functions().httpsCallable('auth')
-      const { data } = await exchangeToken({ t: token })
+      if (typeof this.functions === 'undefined') {
+        throw Error("FirebaseAuthClient require 'functions' client to login with custom token")
+      }
+
+      const tokenInputName = get(this.options, 'customTokenMap.inputName', 't')
+      const tokenOutputName = get(this.options, 'customTokenMap.outputName', 'ct')
+
+      const exchangeToken = this.functions.httpsCallable('auth')
+      const { data } = await exchangeToken({ [tokenInputName]: token })
 
       if (data.error === true) {
         throw Error(data.message)
       }
 
-      this.client.signInWithCustomToken(data.ct)
+      this.client.signInWithCustomToken(get(data, tokenOutputName))
     } catch (err) {
       this.emit('error', err)
     }

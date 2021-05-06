@@ -52,15 +52,15 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({
         // Bind events
         client.on('user:set', (user: any) => {
           onUserChange?.(client.driverId, user)
-          setAuth({
+          setAuth(auth => ({
             ...auth,
             [client.driverId]: user
-          })
+          }))
         })
 
         client.on('user:unset', (user: any) => {
           onUserChange?.(client.driverId, null)
-          setAuth(omit(auth, client.driverId))
+          setAuth(auth => omit(auth, client.driverId))
         })
 
         client.on('error', (err: Error) => {

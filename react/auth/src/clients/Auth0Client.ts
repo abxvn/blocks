@@ -27,6 +27,7 @@ export interface Auth0ClientOptions {
   redirectUri: string
   responseType?: string
   scope?: string
+  withFirebaseAuth?: boolean
 }
 
 export default class Auth0Client extends EventEmitter implements IAuthClient {
@@ -43,7 +44,8 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
 
     this.options = Object.assign({
       responseType: 'token id_token',
-      scope: 'openid profile email'
+      scope: 'openid profile email',
+      withFirebaseAuth: true
     }, options) as Auth0ClientOptions
 
     if (['domain', 'clientId', 'redirectUri'].some(
@@ -64,7 +66,7 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
 
     this.once('site:load', window => this.onSiteLoad(window))
     this.once('init', clients => {
-      if (typeof clients[AuthDrivers.FIREBASE_AUTH] === 'undefined') {
+      if (typeof clients[AuthDrivers.FIREBASE_AUTH] === 'undefined' || this.options.withFirebaseAuth !== true) {
         return
       }
 
@@ -72,7 +74,7 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
       // Firebase as sub-authenticator
       const firebase = clients[AuthDrivers.FIREBASE_AUTH]
 
-      this.on('user:set', user => firebase.emit('login:token', get(user, 'token')))
+      this.on('user:set', user => user.verified === true && firebase.emit('login:token', get(user, 'token')))
       this.on('user:unset', () => firebase.onLogout())
     })
   }

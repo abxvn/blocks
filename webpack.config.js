@@ -12,7 +12,8 @@ const {
 const getConfig = async () => {
   return {
     entry: Object.assign(
-      await expandEntries('packages/*')
+      await expandEntries('packages/*'),
+      await expandEntries('react/*')
       // TODO: Enable react components compilation after getting setup fixed
       // ...await expandEntries('packages/react/controls', '**/*.tsx')
     ),

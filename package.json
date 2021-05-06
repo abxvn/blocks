@@ -7,7 +7,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack",
     "start": "webpack",
-    "lint": "eslint packages/**/*.{ts,tsx} gatsby/**/*.js"
+    "lint": "eslint packages/**/*.ts react/**/*.{ts,tsx} gatsby/**/*.js"
   },
   "repository": {
     "type": "git",
@@ -25,8 +25,9 @@
     "url": "https://github.com/tekuasia/blocks/issues"
   },
   "workspaces": [
-    "gatsby/gatsby-teku-routes",
-    "packages/*"
+    "packages/*",
+    "gatsby/*",
+    "react/*"
   ],
   "homepage": "https://github.com/tekuasia/blocks#readme",
   "devDependencies": {

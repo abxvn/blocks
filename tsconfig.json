@@ -1,11 +1,8 @@
 {
   "include": [
-    "./packages/firebase",
-    "./packages/form",
-    "./packages/resolve",
-    "./packages/pluggable",
-    "./packages/progress-bar",
-    "./packages/queues"
+    "./packages/**/*.ts",
+    "./react/**/*.ts",
+    "./react/**/*.tsx"
   ],
   "compilerOptions": {
     // "declaration": true,

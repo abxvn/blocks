@@ -32,23 +32,26 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
       void this._loginWithCustomToken(token)
     })
 
-    onAuthStateChanged((user: any) => {
-      if (user !== null && user !== undefined) {
-        user.getIdTokenResult(true).then((result: any) => {
-          const profile = {
-            id: user.uid,
-            token: result.token,
-            // TODO: Add mapping for custom claims options
-            groups: get(result, 'claims.g', [])
-          }
+    this.once('init', () => {
+      // Connect to firebase auth SDK
+      onAuthStateChanged((user: any) => {
+        if (user !== null && user !== undefined) {
+          user.getIdTokenResult(true).then((result: any) => {
+            const profile = {
+              id: user.uid,
+              token: result.token,
+              // TODO: Add mapping for custom claims options
+              groups: get(result, 'claims.g', [])
+            }
 
-          this.emit('user:set', profile)
-        }).catch((err: Error) => {
-          this.emit('error', err)
-        })
-      } else {
-        this.emit('user:unset')
-      }
+            this.emit('user:set', profile)
+          }).catch((err: Error) => {
+            this.emit('error', err)
+          })
+        } else {
+          this.emit('user:unset')
+        }
+      })
     })
   }
 

@@ -56,13 +56,25 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
       clientID: this.options.clientId
     }))
 
-    this.on('site:load', window => this.onSiteLoad(window))
-
     this.on('logout', () => this.onLogout())
     this.on('login', () => this.onLogin())
     this.on('signup', () => this.onLogin({
       screen_hint: 'signup'
     }))
+
+    this.once('site:load', window => this.onSiteLoad(window))
+    this.once('init', clients => {
+      if (typeof clients[AuthDrivers.FIREBASE_AUTH] === 'undefined') {
+        return
+      }
+
+      // Use Auth0 as main authenticator
+      // Firebase as sub-authenticator
+      const firebase = clients[AuthDrivers.FIREBASE_AUTH]
+
+      this.on('user:set', user => firebase.emit('login:token', get(user, 'token')))
+      this.on('user:unset', () => firebase.onLogout())
+    })
   }
 
   onSiteLoad (window: any): void {

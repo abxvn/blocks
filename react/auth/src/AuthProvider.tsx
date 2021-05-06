@@ -1,5 +1,5 @@
 import omit from 'lodash-es/omit'
-import get from 'lodash-es/get'
+import each from 'lodash-es/each'
 import kindOf from 'kind-of'
 import React, { FunctionComponent, useEffect, useState } from 'react'
 import AuthContext from './AuthContext'
@@ -33,50 +33,47 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({
       return
     }
 
-    if (kindOf(withFirebase) === 'object' && withFirebase !== undefined) {
-      clients[AuthDrivers.FIREBASE_AUTH] = new FirebaseAuthClient(withFirebase)
+    const configMap: {[key in AuthDrivers]: any} = {
+      [AuthDrivers.AUTH0]: {
+        config: withAuth0,
+        Client: Auth0Client
+      },
+      [AuthDrivers.FIREBASE_AUTH]: {
+        config: withFirebase,
+        Client: FirebaseAuthClient
+      }
     }
 
-    if (kindOf(withAuth0) === 'object' && withAuth0 !== undefined) {
-      const auth0 = new Auth0Client(withAuth0)
+    // PREPARE CLIENTS
+    each(configMap, ({ config, Client }, driverId) => {
+      if (kindOf(config) === 'object') {
+        const client = new Client(config)
 
-      // Use Auth0 as main authenticator
-      // Firebase as sub-authenticator
-      if (typeof clients[AuthDrivers.FIREBASE_AUTH] !== 'undefined') {
-        const firebase = clients[AuthDrivers.FIREBASE_AUTH] as FirebaseAuthClient
-
-        auth0.on('user:set', user => {
-          firebase?.emit('login:token', get(user, 'token'))
+        // Bind events
+        client.on('user:set', (user: any) => {
+          onUserChange?.(client.driverId, user)
+          setAuth({
+            ...auth,
+            [client.driverId]: user
+          })
         })
 
-        auth0.on('user:unset', () => firebase?.onLogout())
+        client.on('user:unset', (user: any) => {
+          onUserChange?.(client.driverId, null)
+          setAuth(omit(auth, client.driverId))
+        })
+
+        client.on('error', (err: Error) => {
+          onError?.(client.driverId, err)
+        })
+
+        clients[driverId as AuthDrivers] = client
       }
+    })
 
-      clients[AuthDrivers.AUTH0] = auth0
-    }
-
-    // BIND CALLBACKS INTO CREATED DRIVERS
+    // INIT CLIENTS
     Object.values(clients).forEach(client => {
-      if (client === undefined) {
-        return
-      }
-
-      client.on('user:set', user => {
-        onUserChange?.(client.driverId, user)
-        setAuth({
-          ...auth,
-          [client.driverId]: user
-        })
-      })
-
-      client.on('user:unset', user => {
-        onUserChange?.(client.driverId, null)
-        setAuth(omit(auth, client.driverId))
-      })
-
-      client.on('error', err => {
-        onError?.(client.driverId, err)
-      })
+      client?.emit('init', clients)
     })
 
     // TRIGGER SITE LOAD

@@ -9,8 +9,8 @@ import AuthDrivers from './AuthDrivers'
 
 interface AuthProviderProps {
   withAuth0?: Auth0ClientOptions
-  withFirebase?: FirebaseAuthClientOptions
-  withProfile?: any
+  withFirebaseAuth?: FirebaseAuthClientOptions
+  withFirebaseProfile?: any
   onUserChange?: (driverId: AuthDrivers, user: any) => void
   onError?: (driverId: AuthDrivers, error: Error) => void
 }
@@ -21,7 +21,7 @@ const clients: {[key in AuthDrivers]?: ClientType} = {}
 const AuthProvider: FunctionComponent<AuthProviderProps> = ({
   children,
   withAuth0,
-  withFirebase,
+  withFirebaseAuth,
   onUserChange,
   onError
 }) => {
@@ -39,7 +39,7 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({
         Client: Auth0Client
       },
       [AuthDrivers.FIREBASE_AUTH]: {
-        config: withFirebase,
+        config: withFirebaseAuth,
         Client: FirebaseAuthClient
       }
     }

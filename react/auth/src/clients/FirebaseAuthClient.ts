@@ -2,12 +2,15 @@ import EventEmitter from 'eventemitter3'
 import AuthDrivers from '../AuthDrivers'
 import IAuthClient from './IAuthClient'
 import get from 'lodash-es/get'
+import each from 'lodash-es/each'
 
 export interface FirebaseAuthClientOptions {
-  functions?: any
-  customTokenMap: any
   auth: any
   onAuthStateChanged: (user: any) => void
+  customClaimMap?: {[key: string]: string}
+  functions?: any
+  customTokenEndpoint?: string
+  customTokenMap?: {[key: string]: string}
 }
 
 export default class FirebaseAuthClient extends EventEmitter implements IAuthClient {
@@ -27,6 +30,7 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
       throw TypeError("FirebaseAuthClient requires 'auth' client and 'onAuthStateChanged' callback")
     }
 
+    this.functions = functions
     this.client = auth
     this.on('logout', () => this.onLogout())
     this.on('login:token', token => {
@@ -40,12 +44,17 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
       onAuthStateChanged((user: any) => {
         if (user !== null && user !== undefined) {
           user.getIdTokenResult(true).then((result: any) => {
-            const profile = {
+            const customClaims = get(result, 'claims', {})
+            const customClaimMap = get(this.options, 'customClaimMap', {})
+
+            const profile: any = {
               id: user.uid,
-              token: result.token,
-              // TODO: Add mapping for custom claims options
-              groups: get(result, 'claims.g', [])
+              token: result.token
             }
+
+            each(customClaimMap, (fromProp, toProp) => {
+              profile[toProp] = get(customClaims, fromProp)
+            })
 
             this.emit('user:set', profile)
           }).catch((err: Error) => {
@@ -70,13 +79,13 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
   async _loginWithCustomToken (token: string): Promise<void> {
     try {
       if (typeof this.functions === 'undefined') {
-        throw Error("FirebaseAuthClient require 'functions' client to login with custom token")
+        throw Error("FirebaseAuthClient requires 'functions' client to login with custom token")
       }
 
       const tokenInputName = get(this.options, 'customTokenMap.inputName', 't')
-      const tokenOutputName = get(this.options, 'customTokenMap.outputName', 'ct')
+      const tokenOutputName = get(this.options, 'customTokenMap.c', 'ct')
 
-      const exchangeToken = this.functions.httpsCallable('auth')
+      const exchangeToken = this.functions.httpsCallable(get(this.options, 'customTokenEndpoint', 'auth'))
       const { data } = await exchangeToken({ [tokenInputName]: token })
 
       if (data.error === true) {

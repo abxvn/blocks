@@ -3,10 +3,7 @@
 [![@teku-blocks/react-auth version][npm-version-badge]][npm-url]
 [![@teku-blocks/react-auth downloads per months][npm-downloads-badge]][npm-url]
 
-Simple solution to make your React application authentication / authorization using these providers:
-- Auth0
-- Firebase Auth
-- Firebase Profile
+Simple solution to make your React web application authentication / authorization. Designed to work with [Auth0](https://auth0.com/docs/libraries/auth0js), [Firebase v8](https://firebase.google.com/support/release-notes/js) and  [Firebase v9](https://firebase.google.com/docs/web/modular-upgrade).
 
 **Table of contents**
 * [Installation](#installation)
@@ -93,12 +90,14 @@ These are options of Firebase auth driver:
 
 **`withFirebaseProfile`**
 
-This driver requires `withFirebaseAuth` to be setup, it will listen for firebase auth data changed to determine when to fetch necessary profile.
+This driver requires `withFirebaseAuth` to be setup, it will listen for firebase auth data changed to determine when to fetch necessary profile, to login and logout.
 
-| **Option** | **Type**                                        | **Description**                                                  | **Default** |
-|------------|-------------------------------------------------|------------------------------------------------------------------|-------------|
-| collection | [Collection Reference][#firebase-collectionref] | `required` Firestore collection reference to pull data from      |             |
-| criteria   | [any][type-object]                              | Additional criteria to filter profile data with firebase user id | `{}`        |
+| **Option**  | **Type**                                                                                                           | **Description**                                                                                                                                                                                    | **Default** |
+|-------------|--------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
+| getQuery    | (conditions: [any][type-object]) => [Query][firestore-query]                                                     | `required` A function to return a [Firestore Query][firestore-query] for filter user profile, since we only take first found document, a query with `limit(1)` is recommended                      |             |
+| getSnapshot | (query: [Query][firestore-query], onChange: [Function][type-function], onError: [Function][type-function]) => [Unsubscribe][firestore-unsubscribe] | `required` A function to start watching profiles query snapshot. Usually we will need to pass down `onChange` and `onError` to snapshot creator. For example `query.onSnapshot(onChange, onError)` | `{}`        |
+| userIdField | string                                                                                                             | User id field for adding into conditions                                                                                                                                                           | `'uid'`     |
+| criteria    | [any][type-object]                                                                                                 | Additional criteria to filter profile data with firebase user id                                                                                                                                   |             |
 
 ### Access auth data with React hook
 
@@ -124,11 +123,11 @@ After auth0 done authenticated a user, if the user's email has been verified, `r
 
 The full list of supported driver ids can be found in `AuthDrivers` enum. You can use them to determine with part of auth data is being initalized
 
-```
+```ts
 enum AuthDrivers {
   AUTH0 = 'auth0',
-  FIREBASE_AUTH = 'firebase_auth'
-  FIREBASE_PROFILE = 'firebase_profile'
+  FIREBASE_AUTH = 'firebase',
+  FIREBASE_PROFILE = 'profile'
 }
 ```
 
@@ -146,6 +145,7 @@ Thank you.
 [type-object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object
 [type-string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String
 [type-boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[type-function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions
 
 [auth0-basic]: https://auth0.com/docs/get-started/dashboard/application-settings#basic-information
 [auth0-uris]: https://auth0.com/docs/get-started/dashboard/application-settings#application-uris
@@ -153,4 +153,5 @@ Thank you.
 
 [firebase-auth]: https://firebase.google.com/docs/reference/js/firebase.auth
 [firebase-functions]: https://firebase.google.com/docs/reference/js/firebase.functions
-[firebase-collectionref]: https://firebase.google.com/docs/reference/js/firebase.firestore.CollectionReference
+[firestore-query]: https://firebase.google.com/docs/reference/js/firebase.firestore.Query
+[firestore-unsubscribe]: https://firebase.google.com/docs/reference/js/v9/firestore_.unsubscribe

@@ -4,6 +4,12 @@ import IAuthClient from './IAuthClient'
 import get from 'lodash-es/get'
 import each from 'lodash-es/each'
 
+export interface FirebaseAuthProfile {
+  id: string
+  token: string
+  [field: string]: any
+}
+
 export interface FirebaseAuthClientOptions {
   auth: any
   onAuthStateChanged: (user: any) => void
@@ -47,7 +53,7 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
             const customClaims = get(result, 'claims', {})
             const customClaimMap = get(this.options, 'customClaimMap', {})
 
-            const profile: any = {
+            const profile: FirebaseAuthProfile = {
               id: user.uid,
               token: result.token
             }

@@ -3,20 +3,20 @@ import get from 'lodash-es/get'
 import kindOf from 'kind-of'
 import React, { FunctionComponent, useEffect, useState } from 'react'
 import AuthContext from './AuthContext'
-import Auth0Driver, { Auth0DriverOptions } from './drivers/Auth0Driver'
-import FirebaseAuthDriver, { FirebaseAuthDriverOptions } from './drivers/FirebaseAuthDriver'
+import Auth0Client, { Auth0ClientOptions } from './clients/Auth0Client'
+import FirebaseAuthClient, { FirebaseAuthClientOptions } from './clients/FirebaseAuthClient'
 import AuthDrivers from './AuthDrivers'
 
 interface AuthProviderProps {
-  withAuth0?: Auth0DriverOptions
-  withFirebase?: FirebaseAuthDriverOptions
+  withAuth0?: Auth0ClientOptions
+  withFirebase?: FirebaseAuthClientOptions
   withProfile?: any
   onUserChange?: (driverId: AuthDrivers, user: any) => void
   onError?: (driverId: AuthDrivers, error: Error) => void
 }
 
-type DriverType = Auth0Driver | FirebaseAuthDriver
-const clients: {[key in AuthDrivers]?: DriverType} = {}
+type ClientType = Auth0Client | FirebaseAuthClient
+const clients: {[key in AuthDrivers]?: ClientType} = {}
 
 const AuthProvider: FunctionComponent<AuthProviderProps> = ({
   children,
@@ -34,16 +34,16 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({
     }
 
     if (kindOf(withFirebase) === 'object' && withFirebase !== undefined) {
-      clients[AuthDrivers.FIREBASE_AUTH] = new FirebaseAuthDriver(withFirebase)
+      clients[AuthDrivers.FIREBASE_AUTH] = new FirebaseAuthClient(withFirebase)
     }
 
     if (kindOf(withAuth0) === 'object' && withAuth0 !== undefined) {
-      const auth0 = new Auth0Driver(withAuth0)
+      const auth0 = new Auth0Client(withAuth0)
 
       // Use Auth0 as main authenticator
       // Firebase as sub-authenticator
       if (typeof clients[AuthDrivers.FIREBASE_AUTH] !== 'undefined') {
-        const firebase = clients[AuthDrivers.FIREBASE_AUTH] as FirebaseAuthDriver
+        const firebase = clients[AuthDrivers.FIREBASE_AUTH] as FirebaseAuthClient
 
         auth0.on('user:set', user => {
           firebase?.emit('login:token', get(user, 'token'))
@@ -56,32 +56,32 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({
     }
 
     // BIND CALLBACKS INTO CREATED DRIVERS
-    Object.values(clients).forEach(driver => {
-      if (driver === undefined) {
+    Object.values(clients).forEach(client => {
+      if (client === undefined) {
         return
       }
 
-      driver.on('user:set', user => {
-        onUserChange?.(driver.driverId, user)
+      client.on('user:set', user => {
+        onUserChange?.(client.driverId, user)
         setAuth({
           ...auth,
-          [driver.driverId]: user
+          [client.driverId]: user
         })
       })
 
-      driver.on('user:unset', user => {
-        onUserChange?.(driver.driverId, null)
-        setAuth(omit(auth, driver.driverId))
+      client.on('user:unset', user => {
+        onUserChange?.(client.driverId, null)
+        setAuth(omit(auth, client.driverId))
       })
 
-      driver.on('error', err => {
-        onError?.(driver.driverId, err)
+      client.on('error', err => {
+        onError?.(client.driverId, err)
       })
     })
 
     // TRIGGER SITE LOAD
-    Object.values(clients).forEach(driver => {
-      driver?.emit('site:load', window)
+    Object.values(clients).forEach(client => {
+      client?.emit('site:load', window)
     })
   }, [])
 
@@ -99,5 +99,5 @@ export const trigger = (driver: AuthDrivers, event: string, params: any = undefi
 }
 
 export const triggerAll = (event: string, params: any = undefined): void => {
-  Object.values(clients).forEach(driver => driver?.emit(event, params))
+  Object.values(clients).forEach(client => client?.emit(event, params))
 }

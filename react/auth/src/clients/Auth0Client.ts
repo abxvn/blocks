@@ -4,7 +4,7 @@ import { AuthorizeOptions, WebAuth } from 'auth0-js'
 import get from 'lodash-es/get'
 import pick from 'lodash-es/pick'
 import AuthDrivers from '../AuthDrivers'
-import IAuthDriver from './IAuthDriver'
+import IAuthClient from './IAuthClient'
 
 export interface Auth0Result {
   token: string
@@ -21,7 +21,7 @@ export interface Auth0Profile {
   tokenExpiresAt: number
 }
 
-export interface Auth0DriverOptions {
+export interface Auth0ClientOptions {
   domain: string
   clientId: string
   redirectUri: string
@@ -29,27 +29,27 @@ export interface Auth0DriverOptions {
   scope?: string
 }
 
-export default class Auth0Driver extends EventEmitter implements IAuthDriver {
+export default class Auth0Client extends EventEmitter implements IAuthClient {
   static readonly SSO_DELAY = 20 * 60 * 1000 // 20min
 
   readonly driverId = AuthDrivers.AUTH0
 
-  private readonly options: Auth0DriverOptions
+  private readonly options: Auth0ClientOptions
   private readonly client: WebAuth
   private ssoInterval: any = null
 
-  constructor (options: Auth0DriverOptions) {
+  constructor (options: Auth0ClientOptions) {
     super()
 
     this.options = Object.assign({
       responseType: 'token id_token',
       scope: 'openid profile email'
-    }, options) as Auth0DriverOptions
+    }, options) as Auth0ClientOptions
 
     if (['domain', 'clientId', 'redirectUri'].some(
       configKey => kindOf(get(this.options, configKey)) !== 'string'
     )) {
-      throw TypeError("Auth0Driver requires 'domain', 'clientId' and 'redirectUri'")
+      throw TypeError("Auth0Client requires 'domain', 'clientId' and 'redirectUri'")
     }
 
     this.client = new WebAuth(Object.assign({}, this.options, {
@@ -116,7 +116,7 @@ export default class Auth0Driver extends EventEmitter implements IAuthDriver {
           // Function handles errors internally
           // eslint-disable-next-line no-void
           void this._handleSilentSSO()
-        }, Auth0Driver.SSO_DELAY)
+        }, Auth0Client.SSO_DELAY)
       }
     } catch (err) {
       if (!isFirstCall) {

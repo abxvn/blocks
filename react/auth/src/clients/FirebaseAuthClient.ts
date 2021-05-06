@@ -1,26 +1,26 @@
 import EventEmitter from 'eventemitter3'
 import AuthDrivers from '../AuthDrivers'
-import IAuthDriver from './IAuthDriver'
+import IAuthClient from './IAuthClient'
 import get from 'lodash-es/get'
 
-export interface FirebaseAuthDriverOptions {
+export interface FirebaseAuthClientOptions {
   firebase: any
   firebaseAuth: any
   onAuthStateChanged: (user: any) => void
 }
 
-export default class FirebaseAuthDriver extends EventEmitter implements IAuthDriver {
+export default class FirebaseAuthClient extends EventEmitter implements IAuthClient {
   readonly driverId = AuthDrivers.FIREBASE_AUTH
   private readonly firebase: any
   private readonly client: any
 
-  constructor (options: FirebaseAuthDriverOptions) {
+  constructor (options: FirebaseAuthClientOptions) {
     super()
 
     const { firebase, firebaseAuth, onAuthStateChanged } = options
 
     if ([firebase, firebaseAuth, onAuthStateChanged].some(e => e === undefined)) {
-      throw TypeError("FirebaseAuthDriver requires 'firebase', 'firebaseAuth' client and 'onAuthStateChanged' callback")
+      throw TypeError("FirebaseAuthClient requires 'firebase', 'firebaseAuth' client and 'onAuthStateChanged' callback")
     }
 
     this.firebase = firebase

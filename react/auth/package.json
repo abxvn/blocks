@@ -1,6 +1,5 @@
 {
   "name": "@teku-blocks/react-auth",
-  "private": true,
   "version": "1.0.0",
   "description": "Teku's react authentication",
   "files": [

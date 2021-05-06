@@ -60,7 +60,7 @@ This callback is only fired when error happens.
 
 ### Driver options
 
-The driver options (`objects`) will be used to initialize authentication clients.
+The driver options ([objects][type-object]) will be used to initialize authentication clients.
 
 **`withAuth0`**
 
@@ -85,7 +85,7 @@ These are options of Firebase auth driver:
 | onAuthStateChanged  | (user: [any][type-object] or `null`) => void | `required` Callback whenever firebase auth user logged in / logged out (`null`)                                                      |                                        |
 | customClaimMap      | [any][type-object]                          | Map fields from custom claims into solved user                                                                                       | `{}`                                   |
 | functions           | [Functions][firebase-functions]             | Only required when you combine firebase with auth0 [more-info](#using-auth0-with-firebase)                                           |                                        |
-| customTokenEndpoint | [string][type-string]                       | Cloud function name for exchanging custom tokens                                                                                     | `'auth'`                               |
+| customTokenEndpoint | [string][type-string]                       | Cloud function name for exchanging custom tokens                                                                                     | `auth`                               |
 | customTokenMap      | [any][type-object]                          | Provide fields to be used during custom token exchanges when you combine firebase with auth0 [more-info](#using-auth0-with-firebase) | `{ inputName: 't', outputName: 'ct' }` |
 
 **`withFirebaseProfile`**
@@ -96,7 +96,7 @@ This driver requires `withFirebaseAuth` to be setup, it will listen for firebase
 |-------------|--------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
 | getQuery    | (conditions: [any][type-object]) => [Query][firestore-query]                                                     | `required` A function to return a [Firestore Query][firestore-query] for filter user profile, since we only take first found document, a query with `limit(1)` is recommended                      |             |
 | getSnapshot | (query: [Query][firestore-query], onChange: [Function][type-function], onError: [Function][type-function]) => [Unsubscribe][firestore-unsubscribe] | `required` A function to start watching profiles query snapshot. Usually we will need to pass down `onChange` and `onError` to snapshot creator. For example `query.onSnapshot(onChange, onError)` | `{}`        |
-| userIdField | string                                                                                                             | User id field for adding into conditions                                                                                                                                                           | `'uid'`     |
+| userIdField | string                                                                                                             | User id field for adding into conditions                                                                                                                                                           | `uid`     |
 | criteria    | [any][type-object]                                                                                                 | Additional criteria to filter profile data with firebase user id                                                                                                                                   |             |
 
 ### Access auth data with React hook

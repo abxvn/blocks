@@ -9,17 +9,17 @@ import AuthDrivers from './AuthDrivers'
 import FirebaseProfileClient from './clients/FirebaseProfileClient'
 
 interface AuthProviderProps {
-  withAuth0?: Auth0ClientOptions
-  withFirebaseAuth?: FirebaseAuthClientOptions
-  withFirebaseProfile?: any
-  onUserChange?: (driverId: AuthDrivers, user: any) => void
-  onError?: (driverId: AuthDrivers, error: Error) => void
+  withAuth0: Auth0ClientOptions
+  withFirebaseAuth: FirebaseAuthClientOptions
+  withFirebaseProfile: any
+  onUserChange: (driverId: AuthDrivers, user: any) => void
+  onError: (driverId: AuthDrivers, error: Error) => void
 }
 
 type ClientType = Auth0Client | FirebaseAuthClient
 const clients: {[key in AuthDrivers]?: ClientType} = {}
 
-const AuthProvider: FunctionComponent<AuthProviderProps> = ({
+const AuthProvider: FunctionComponent<Partial<AuthProviderProps>> = ({
   children,
   withAuth0,
   withFirebaseAuth,
@@ -58,7 +58,7 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({
         // Bind events
         client.on('user:set', (user: any) => {
           onUserChange?.(client.driverId, user)
-          setAuth(auth => ({
+          setAuth((auth: any) => ({
             ...auth,
             [client.driverId]: user
           }))
@@ -66,7 +66,7 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({
 
         client.on('user:unset', (user: any) => {
           onUserChange?.(client.driverId, null)
-          setAuth(auth => omit(auth, client.driverId))
+          setAuth((auth: any) => omit(auth, client.driverId))
         })
 
         client.on('error', (err: Error) => {

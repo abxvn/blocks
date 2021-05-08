@@ -9,14 +9,10 @@ const {
   NODE_ENV = 'development'
 } = process.env
 
+const expandedEntriesPath = process.env.ENTRY_PATH || '{packages,react}/*'
 const getConfig = async () => {
   return {
-    entry: Object.assign(
-      await expandEntries('packages/*'),
-      await expandEntries('react/*')
-      // TODO: Enable react components compilation after getting setup fixed
-      // ...await expandEntries('packages/react/controls', '**/*.tsx')
-    ),
+    entry: await expandEntries(expandedEntriesPath),
     mode: NODE_ENV,
     target: 'node',
     output: {

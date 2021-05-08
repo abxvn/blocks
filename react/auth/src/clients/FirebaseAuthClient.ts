@@ -3,10 +3,11 @@ import AuthDrivers from '../AuthDrivers'
 import IAuthClient from './IAuthClient'
 import get from 'lodash-es/get'
 import each from 'lodash-es/each'
+import pick from 'lodash-es/pick'
 
 export interface FirebaseAuthProfile {
-  id: string
-  token: string
+  uid: string
+  _token: string
   [field: string]: any
 }
 
@@ -53,10 +54,16 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
             const customClaims = get(result, 'claims', {})
             const customClaimMap = get(this.options, 'customClaimMap', {})
 
-            const profile: FirebaseAuthProfile = {
-              id: user.uid,
-              token: result.token
-            }
+            const profile: FirebaseAuthProfile = pick(user, [
+              'uid',
+              'email',
+              'emailVerified',
+              'phoneNumber',
+              'name'
+            ]) as FirebaseAuthProfile
+
+            profile._token = result.token
+            profile.picture = get(user, 'photoURL')
 
             each(customClaimMap, (fromProp, toProp) => {
               profile[toProp] = get(customClaims, fromProp)

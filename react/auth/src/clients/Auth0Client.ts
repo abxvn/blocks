@@ -13,12 +13,12 @@ export interface Auth0Result {
 }
 
 export interface Auth0Profile {
+  _token: string
+  _tokenExpiresAt: number
   email: string
+  emailVerified: boolean
   name: string
   picture: string
-  verified: boolean
-  token: string
-  tokenExpiresAt: number
 }
 
 export interface Auth0ClientOptions {
@@ -74,7 +74,7 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
       // Firebase as sub-authenticator
       const firebase = clients[AuthDrivers.FIREBASE_AUTH]
 
-      this.on('user:set', user => user.verified === true && firebase.emit('login:token', get(user, 'token')))
+      this.on('user:set', user => user.verified === true && firebase.emit('login:token', get(user, '_token')))
       this.on('user:unset', () => firebase.onLogout())
     })
   }
@@ -218,14 +218,14 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
       profile.name = get(result.profile, 'nickname', profile.name)
     }
 
-    const token = get(result, 'token')
-    const tokenExpiresAt = get(result, 'expiresAt')
-    const verified = get(result.profile, 'email_verified', 'verified')
+    const _token = get(result, 'token')
+    const _tokenExpiresAt = get(result, 'expiresAt')
+    const emailVerified = get(result.profile, 'email_verified', false)
 
     return Object.assign({
-      token,
-      tokenExpiresAt,
-      verified
+      _token,
+      _tokenExpiresAt,
+      emailVerified
     }, profile)
   }
 

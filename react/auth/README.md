@@ -11,7 +11,7 @@ Simple solution to make your React web application authentication / authorizatio
   + [Handle auth with AuthProvider](#handle-auth-with-authprovider)
   + [Callbacks](#callbacks)
   + [Driver options](#driver-options)
-  + [Access auth data with React hook](#access-auth-data-with-react-hook)
+  + [Access auth data with AuthContext](#access-auth-data-with-authcontext)
   + [Using Auth0 with Firebase](#using-auth0-with-firebase)
 * [List of available driver ids](#list-of-available-driver-ids)
 * [Contribution](#contribution)
@@ -21,6 +21,15 @@ Simple solution to make your React web application authentication / authorizatio
 ```shell
 npm install --dev @teku-blocks/react-auth
 ```
+
+## Concept
+
+There are 3 supported auth drivers:
+- **Auth0**: Using [auth0][auth0], or even in combination with Firebase Auth
+- **FirebaseAuth**: Using Google [Firebase Auth][firebase-auth]
+- **FireseProfile**: Fetching user profile from Google [Firestore][service-firestore]
+
+After initialization, these [drivers](#driver-options) will automatically handle authentication / authorization logic for you, the resolved profiles will be pushed into [AuthContext](#access-auth-data-with-authcontext) through their [driver ids](#list-of-available-driver-ids) and even trigger [event handlers](#callbacks) for us.
 
 ## How To Use
 
@@ -75,6 +84,16 @@ These are only options which is required or provided with default values. More a
 | scope            | [string][type-string]   | Scope                                                                                                           | `openid profile email` |
 | withFirebaseAuth | [boolean][type-boolean] | Whether should auth0 connected to firebase auth, more info in [Auth0 with Firebase](#using-auth0-with-firebase) |                        |
 
+
+**Authenticated Auth0 profile contains these fields:**
+- `_token`: auth token
+- `_tokenExpiresAt`: token expiration timestamp
+- `email`: user email
+- `emailVerified`: where the user email has been verified
+- `name`: user name
+- `picture`: URL to user picture
+
+
 **`withFirebaseAuth`**
 
 These are options of Firebase auth driver:
@@ -88,9 +107,21 @@ These are options of Firebase auth driver:
 | customTokenEndpoint | [string][type-string]                       | Cloud function name for exchanging custom tokens                                                                                     | `auth`                               |
 | customTokenMap      | [any][type-object]                          | Provide fields to be used during custom token exchanges when you combine firebase with auth0 [more-info](#using-auth0-with-firebase) | `{ inputName: 't', outputName: 'ct' }` |
 
+**Authenticated FirebaseAuth profile contains these fields:**
+- `_token`: auth token
+- `uid`: user's uid
+- `email`: user email
+- `emailVerified`: where the user email has been verified
+- `phoneNumber`: user associated phone number
+- `name`: user name
+- `custom` claim fields
+- `picture`: URL to user picture
+
+Apart from `_token`, `uid` and `picture`, other fields are standardized to be used as Firebase security rules [more info](https://firebase.google.com/docs/reference/rules/rules.firestore.Request#auth).
+
 **`withFirebaseProfile`**
 
-This driver requires `withFirebaseAuth` to be setup, it will listen for firebase auth data changed to determine when to fetch necessary profile, to login and logout.
+This driver requires `withFirebaseAuth` to be setup, it will **watch** for firebase auth data changed to determine when to fetch necessary profile, to login and logout.
 
 | **Option**  | **Type**                                                                                                           | **Description**                                                                                                                                                                                    | **Default** |
 |-------------|--------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
@@ -99,7 +130,7 @@ This driver requires `withFirebaseAuth` to be setup, it will listen for firebase
 | userIdField | string                                                                                                             | User id field for adding into conditions                                                                                                                                                           | `uid`     |
 | criteria    | [any][type-object]                                                                                                 | Additional criteria to filter profile data with firebase user id                                                                                                                                   |             |
 
-### Access auth data with React hook
+### Access auth data with AuthContext
 
 We profile a React hook to listen for auth data context changes
 
@@ -139,7 +170,7 @@ Thank you.
 
 [npm-url]: https://www.npmjs.com/package/@teku-blocks/react-auth
 [npm-downloads-badge]: https://img.shields.io/npm/dw/@teku-blocks/react-auth
-[npm-version-badge]: https://badge.fury.io/js/@teku-blocks/react-auth.svg
+[npm-version-badge]: https://img.shields.io/npm/v/@teku-blocks/react-auth.svg
 
 [type-error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
 [type-object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object
@@ -155,3 +186,6 @@ Thank you.
 [firebase-functions]: https://firebase.google.com/docs/reference/js/firebase.functions
 [firestore-query]: https://firebase.google.com/docs/reference/js/firebase.firestore.Query
 [firestore-unsubscribe]: https://firebase.google.com/docs/reference/js/v9/firestore_.unsubscribe
+
+[firestore]: https://firebase.google.com/docs/firestore
+[auth0]: https://auth0.com/

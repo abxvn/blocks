@@ -57,7 +57,7 @@ export default class FirebaseProfileClient extends EventEmitter implements IAuth
   private _getProfile (user: FirebaseAuthProfile): void {
     const userIdField = get(this.options, 'userIdField', 'uid')
     const conditions = Object.assign({
-      [userIdField]: user.id
+      [userIdField]: user.uid
     }, get(this.options, 'criteria'))
 
     const query = this.getQuery(conditions)

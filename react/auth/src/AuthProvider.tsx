@@ -1,7 +1,6 @@
-import omit from 'lodash-es/omit'
-import each from 'lodash-es/each'
-import kindOf from 'kind-of'
 import React, { FunctionComponent, useEffect, useState } from 'react'
+
+import { each, is, omit } from './lib'
 import AuthContext from './AuthContext'
 import Auth0Client, { Auth0ClientOptions } from './clients/Auth0Client'
 import FirebaseAuthClient, { FirebaseAuthClientOptions } from './clients/FirebaseAuthClient'
@@ -52,7 +51,7 @@ const AuthProvider: FunctionComponent<Partial<AuthProviderProps>> = ({
 
     // PREPARE CLIENTS
     each(configMap, ({ config, Client }, driverId) => {
-      if (kindOf(config) === 'object') {
+      if (is('object', config)) {
         const client = new Client(config)
 
         // Bind events

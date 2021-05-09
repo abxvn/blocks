@@ -1,5 +1,5 @@
-import EventEmitter from 'eventemitter3'
-import get from 'lodash-es/get'
+import { get, EventEmitter } from '../lib'
+
 import AuthDrivers from '../AuthDrivers'
 import FirebaseAuthClient, { FirebaseAuthProfile } from './FirebaseAuthClient'
 import IAuthClient from './IAuthClient'

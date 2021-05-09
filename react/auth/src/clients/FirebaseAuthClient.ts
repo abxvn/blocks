@@ -1,9 +1,7 @@
 import EventEmitter from 'eventemitter3'
 import AuthDrivers from '../AuthDrivers'
 import IAuthClient from './IAuthClient'
-import get from 'lodash-es/get'
-import each from 'lodash-es/each'
-import pick from 'lodash-es/pick'
+import { is, each, get, pick } from '../lib'
 
 export interface FirebaseAuthProfile {
   uid: string
@@ -15,29 +13,29 @@ export interface FirebaseAuthClientOptions {
   auth: any
   onAuthStateChanged: (user: any) => void
   customClaimMap?: {[key: string]: string}
-  functions?: any
-  customTokenEndpoint?: string
-  customTokenMap?: {[key: string]: string}
+  withAuth0?: boolean
+  getCustomToken?: (token: string) => Promise<any>
+  customTokenOutput?: string
 }
 
 export default class FirebaseAuthClient extends EventEmitter implements IAuthClient {
   readonly driverId = AuthDrivers.FIREBASE_AUTH
 
   private readonly options: any
-  private readonly functions: any
   private readonly client: any
 
   constructor (options: FirebaseAuthClientOptions) {
     super()
 
-    const { auth, onAuthStateChanged, functions, ...otherOptions } = options
+    const { auth, onAuthStateChanged, ...otherOptions } = options
 
-    this.options = otherOptions
+    this.options = Object.assign({
+      withAuth0: true
+    }, otherOptions)
     if ([auth, onAuthStateChanged].some(e => e === undefined)) {
-      throw TypeError("FirebaseAuthClient requires 'auth' client and 'onAuthStateChanged' callback")
+      throw TypeError('FirebaseAuthClient needs \'auth\' client and \'onAuthStateChanged\' callback')
     }
 
-    this.functions = functions
     this.client = auth
     this.on('logout', () => this.onLogout())
     this.on('login:token', token => {
@@ -46,7 +44,7 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
       void this._loginWithCustomToken(token)
     })
 
-    this.once('init', () => {
+    this.once('init', clients => {
       // Connect to firebase auth SDK
       onAuthStateChanged((user: any) => {
         if (user !== null && user !== undefined) {
@@ -77,6 +75,26 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
           this.emit('user:unset')
         }
       })
+
+      // Connect with Auth0
+      if (this.options.withAuth0 !== true) {
+        return // not combining with Auth0
+      }
+
+      if (!is('function', this.options, 'getCustomToken')) {
+        throw TypeError('FirebaseAuthClient needs \'getCustomToken\' async function to process login with custom tokens')
+      }
+
+      if (typeof clients[AuthDrivers.AUTH0] === 'undefined') {
+        throw Error('FirebaseAuthClient cannot find Auth0 client to combine with, anyway withAuth0 can be turned off using options')
+      }
+
+      // Use Auth0 as main authenticator
+      // Firebase as sub-authenticator
+      const auth0 = clients[AuthDrivers.AUTH0]
+
+      auth0.on('user:set', (auth0User: any) => auth0User.emailVerified === true && this.emit('login:token', get(auth0User, '_token')))
+      auth0.on('user:unset', () => this.onLogout())
     })
   }
 
@@ -91,18 +109,16 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
 
   async _loginWithCustomToken (token: string): Promise<void> {
     try {
-      if (typeof this.functions === 'undefined') {
-        throw Error("FirebaseAuthClient requires 'functions' client to login with custom token")
+      const tokenOutputName = get(this.options, 'customTokenOutput', 'token')
+
+      if (!is('function', this.options, 'getCustomToken')) {
+        throw TypeError('FirebaseAuthClient needs \'getCustomToken\' async function to process login with custom tokens')
       }
 
-      const tokenInputName = get(this.options, 'customTokenMap.inputName', 't')
-      const tokenOutputName = get(this.options, 'customTokenMap.c', 'ct')
+      const { data, error } = await this.options.getCustomToken(token)
 
-      const exchangeToken = this.functions.httpsCallable(get(this.options, 'customTokenEndpoint', 'auth'))
-      const { data } = await exchangeToken({ [tokenInputName]: token })
-
-      if (data.error === true) {
-        throw Error(data.message)
+      if (error !== undefined) {
+        throw Error(get(error, 'message', 'Unknown error'))
       }
 
       this.client.signInWithCustomToken(get(data, tokenOutputName))

@@ -14,8 +14,7 @@ export interface FirebaseAuthClientOptions {
   onAuthStateChanged: (user: any) => void
   customClaimMap?: {[key: string]: string}
   withAuth0?: boolean
-  getCustomToken?: (token: string) => Promise<any>
-  customTokenOutput?: string
+  getCustomToken?: (token: string) => Promise<string>
 }
 
 export default class FirebaseAuthClient extends EventEmitter implements IAuthClient {
@@ -109,19 +108,13 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
 
   async _loginWithCustomToken (token: string): Promise<void> {
     try {
-      const tokenOutputName = get(this.options, 'customTokenOutput', 'token')
-
       if (!is('function', this.options, 'getCustomToken')) {
         throw TypeError('FirebaseAuthClient needs \'getCustomToken\' async function to process login with custom tokens')
       }
 
-      const { data, error } = await this.options.getCustomToken(token)
+      const customToken = await this.options.getCustomToken(token)
 
-      if (error !== undefined) {
-        throw Error(get(error, 'message', 'Unknown error'))
-      }
-
-      this.client.signInWithCustomToken(get(data, tokenOutputName))
+      this.client.signInWithCustomToken(customToken)
     } catch (err) {
       this.emit('error', err)
     }

@@ -8,7 +8,7 @@ export { default as omit } from 'lodash-es/omit'
 export const get = _get
 export const typeOf = kindOf
 export const is = (checkedType: string | string[], data: any, path?: string): boolean => {
-  const checkedValue = get(data, path as string, data)
+  const checkedValue = path !== undefined ? get(data, path) : data
 
   switch (typeOf(checkedType)) {
     case 'string':

@@ -22,6 +22,7 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
 
   private readonly options: any
   private readonly client: any
+  private hasSet: boolean = false
 
   constructor (options: FirebaseAuthClientOptions) {
     super()
@@ -43,6 +44,7 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
       void this._loginWithCustomToken(token)
     })
 
+    this.once('user:set', () => (this.hasSet = true))
     this.once('init', clients => {
       // Connect to firebase auth SDK
       onAuthStateChanged((user: any) => {
@@ -70,7 +72,7 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
           }).catch((err: Error) => {
             this.emit('error', err)
           })
-        } else {
+        } else if (this.hasSet) {
           this.emit('user:unset')
         }
       })

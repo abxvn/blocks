@@ -18,6 +18,7 @@ export default class FirebaseProfileClient extends EventEmitter implements IAuth
   private readonly getSnapshot: Function
   private readonly options: any
   private unsubscribe: Function | undefined
+  private hasSet: boolean = false
 
   constructor (options: FirebaseProfileClientOptions) {
     super()
@@ -32,6 +33,7 @@ export default class FirebaseProfileClient extends EventEmitter implements IAuth
     this.getQuery = getQuery
     this.options = otherOptions
 
+    this.once('user:set', () => (this.hasSet = true))
     this.once('init', clients => {
       if (typeof clients[AuthDrivers.FIREBASE_AUTH] === 'undefined') {
         throw TypeError(
@@ -51,7 +53,9 @@ export default class FirebaseProfileClient extends EventEmitter implements IAuth
       this.unsubscribe()
     }
 
-    this.emit('user:unset')
+    if (this.hasSet) {
+      this.emit('user:unset')
+    }
   }
 
   private _getProfile (user: FirebaseAuthProfile): void {

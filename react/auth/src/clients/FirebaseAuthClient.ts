@@ -6,6 +6,11 @@ import { is, each, get, pick } from '../lib'
 export interface FirebaseAuthProfile {
   uid: string
   _token: string
+  email: string
+  emailVerified: boolean
+  phoneNumber: string
+  name: string
+  picture: string
   [field: string]: any
 }
 
@@ -94,7 +99,10 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
       // Firebase as sub-authenticator
       const auth0 = clients[AuthDrivers.AUTH0]
 
-      auth0.on('user:set', (auth0User: any) => auth0User.emailVerified === true && this.emit('login:token', get(auth0User, '_token')))
+      auth0.on('user:set', (auth0User: any) =>
+        auth0User.emailVerified === true &&
+        this.emit('login:token', get(auth0User, '_token'))
+      )
       auth0.on('user:unset', () => this.onLogout())
     })
   }

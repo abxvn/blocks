@@ -114,7 +114,11 @@ class DtsGeneratorPlugin {
                 : packageName + '/' + currentModuleId.replace(/^src\/?/, '')
             },
             resolveModuleImport: ({ importedModuleId, currentModuleId, isDeclaredExternalModule }) => {
-              return packageName + '/' + importedModuleId.replace(/^\.\.?\/?/, '').replace(/^src\/?/, '')
+              const isInternalModule = !isDeclaredExternalModule && importedModuleId.indexOf('.') === 0
+
+              return isInternalModule
+                ? packageName + '/' + importedModuleId.replace(/^\.\.?\/?/, '').replace(/^src\/?/, '')
+                : importedModuleId
             }
           })
         } catch (err) {

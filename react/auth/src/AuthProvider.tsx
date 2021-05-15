@@ -5,24 +5,27 @@ import AuthContext from './AuthContext'
 import Auth0Client, { Auth0ClientOptions } from './clients/Auth0Client'
 import FirebaseAuthClient, { FirebaseAuthClientOptions } from './clients/FirebaseAuthClient'
 import AuthDrivers from './AuthDrivers'
-import FirebaseProfileClient from './clients/FirebaseProfileClient'
+import FirebaseProfileClient, { FirebaseProfileClientOptions } from './clients/FirebaseProfileClient'
+import FirebasePermissionsClient from './permissions/FirebasePermissionsClient'
 
 interface AuthProviderProps {
   withAuth0: Auth0ClientOptions
   withFirebaseAuth: FirebaseAuthClientOptions
-  withFirebaseProfile: any
+  withFirebaseProfile: FirebaseProfileClientOptions
+  withFirebasePermissions: any
   onUserChange: (driverId: AuthDrivers, user: any) => void
   onError: (driverId: AuthDrivers, error: Error) => void
 }
 
 type ClientType = Auth0Client | FirebaseAuthClient
-const clients: {[key in AuthDrivers]?: ClientType} = {}
+export const clients: {[key in AuthDrivers]?: ClientType} = {}
 
 const AuthProvider: FunctionComponent<Partial<AuthProviderProps>> = ({
   children,
   withAuth0,
   withFirebaseAuth,
   withFirebaseProfile,
+  withFirebasePermissions,
   onUserChange,
   onError
 }) => {
@@ -46,6 +49,10 @@ const AuthProvider: FunctionComponent<Partial<AuthProviderProps>> = ({
       [AuthDrivers.FIREBASE_PROFILE]: {
         config: withFirebaseProfile,
         Client: FirebaseProfileClient
+      },
+      [AuthDrivers.FIREBASE_PERMISSIONS]: {
+        config: withFirebasePermissions,
+        Client: FirebasePermissionsClient
       }
     }
 

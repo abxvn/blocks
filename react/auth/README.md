@@ -2,6 +2,8 @@
 =====
 [![@teku-blocks/react-auth version][npm-version-badge]][npm-url]
 [![@teku-blocks/react-auth downloads per months][npm-downloads-badge]][npm-url]
+[![Code style][code-style]][code-style-url]
+[![Install size][code-install-size]][npm-url]
 
 Simple solution to make your React web application authentication / authorization. Designed to work with [Auth0](https://auth0.com/docs/libraries/auth0js), [Firebase v8](https://firebase.google.com/support/release-notes/js) and  [Firebase v9](https://firebase.google.com/docs/web/modular-upgrade).
 
@@ -181,6 +183,9 @@ Thank you.
 [npm-url]: https://www.npmjs.com/package/@teku-blocks/react-auth
 [npm-downloads-badge]: https://img.shields.io/npm/dw/@teku-blocks/react-auth
 [npm-version-badge]: https://img.shields.io/npm/v/@teku-blocks/react-auth.svg
+[code-style]: https://img.shields.io/badge/code_style-standard-brightgreen.svg
+[code-style-url]: https://standardjs.com
+[code-install-size]: https://packagephobia.com/badge?p=@teku-blocks/react-auth
 
 [type-error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
 [type-object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object

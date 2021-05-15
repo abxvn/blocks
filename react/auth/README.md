@@ -2,16 +2,19 @@
 =====
 [![@teku-blocks/react-auth version][npm-version-badge]][npm-url]
 [![@teku-blocks/react-auth downloads per months][npm-downloads-badge]][npm-url]
+[![Code style][code-style]][code-style-url]
+[![Install size][code-install-size]][npm-url]
 
 Simple solution to make your React web application authentication / authorization. Designed to work with [Auth0](https://auth0.com/docs/libraries/auth0js), [Firebase v8](https://firebase.google.com/support/release-notes/js) and  [Firebase v9](https://firebase.google.com/docs/web/modular-upgrade).
 
 **Table of contents**
 * [Installation](#installation)
+* [Concept](#concept)
 * [How To Use](#how-to-use)
   + [Handle auth with AuthProvider](#handle-auth-with-authprovider)
   + [Callbacks](#callbacks)
   + [Driver options](#driver-options)
-  + [Access auth data with React hook](#access-auth-data-with-react-hook)
+  + [Access auth data with AuthContext](#access-auth-data-with-authcontext)
   + [Using Auth0 with Firebase](#using-auth0-with-firebase)
 * [List of available driver ids](#list-of-available-driver-ids)
 * [Contribution](#contribution)
@@ -21,6 +24,15 @@ Simple solution to make your React web application authentication / authorizatio
 ```shell
 npm install --dev @teku-blocks/react-auth
 ```
+
+## Concept
+
+There are 3 supported auth drivers:
+- **Auth0**: Using [auth0][auth0], or even in combination with Firebase Auth
+- **FirebaseAuth**: Using Google [Firebase Auth][firebase-auth]
+- **FireseProfile**: Fetching user profile from Google [Firestore][service-firestore]
+
+After initialization, these [drivers](#driver-options) will automatically handle authentication / authorization logic for you, the resolved profiles will be pushed into [AuthContext](#access-auth-data-with-authcontext) through their [driver ids](#list-of-available-driver-ids) and even trigger [event handlers](#callbacks) for us.
 
 ## How To Use
 
@@ -73,7 +85,16 @@ These are only options which is required or provided with default values. More a
 | redirectUri      | [string][type-string]   | `required` Callback after Auth0 authentication [more info][auth0-uris]                                          |                        |
 | responseType     | [string][type-string]   | Response type                                                                                                   | `token id_token`       |
 | scope            | [string][type-string]   | Scope                                                                                                           | `openid profile email` |
-| withFirebaseAuth | [boolean][type-boolean] | Whether should auth0 connected to firebase auth, more info in [Auth0 with Firebase](#using-auth0-with-firebase) |                        |
+
+
+**Authenticated Auth0 profile contains these fields:**
+- `_token`: auth token
+- `_tokenExpiresAt`: token expiration timestamp
+- `email`: user email
+- `emailVerified`: where the user email has been verified
+- `name`: user name
+- `picture`: URL to user picture
+
 
 **`withFirebaseAuth`**
 
@@ -84,22 +105,34 @@ These are options of Firebase auth driver:
 | auth                | [Auth][#firebase-auth]                      | `required` Firebase auth instance                                                                                                    |                                        |
 | onAuthStateChanged  | (user: [any][type-object] or `null`) => void | `required` Callback whenever firebase auth user logged in / logged out (`null`)                                                      |                                        |
 | customClaimMap      | [any][type-object]                          | Map fields from custom claims into solved user                                                                                       | `{}`                                   |
-| functions           | [Functions][firebase-functions]             | Only required when you combine firebase with auth0 [more-info](#using-auth0-with-firebase)                                           |                                        |
-| customTokenEndpoint | [string][type-string]                       | Cloud function name for exchanging custom tokens                                                                                     | `auth`                               |
-| customTokenMap      | [any][type-object]                          | Provide fields to be used during custom token exchanges when you combine firebase with auth0 [more-info](#using-auth0-with-firebase) | `{ inputName: 't', outputName: 'ct' }` |
+| customTokenMap      | [any][type-object]                          | Provide fields to be used during custom token exchanges when you combine firebase with auth0 [more info](#using-auth0-with-firebase) | `{ inputName: 't', outputName: 'ct' }` |
+| getCustomToken           | (token: [string][type-string]) => Promise<[string][type-string]>             | Only required when you combine firebase with auth0, `async` function to resolve with custom token [more info](#using-auth0-with-firebase)                                           |                                        |
+| withAuth0 | [boolean][type-boolean] | Whether should firebase combine with auth0  |  `true`                 |
+
+**Authenticated FirebaseAuth profile contains these fields:**
+- `_token`: auth token
+- `uid`: user's uid
+- `email`: user email
+- `emailVerified`: where the user email has been verified
+- `phoneNumber`: user associated phone number
+- `name`: user name
+- `custom` claim fields
+- `picture`: URL to user picture
+
+Apart from `_token`, `uid` and `picture`, other fields are standardized to be used as Firebase security rules [more info](https://firebase.google.com/docs/reference/rules/rules.firestore.Request#auth).
 
 **`withFirebaseProfile`**
 
-This driver requires `withFirebaseAuth` to be setup, it will listen for firebase auth data changed to determine when to fetch necessary profile, to login and logout.
+This driver requires `withFirebaseAuth` to be setup, it will **watch** for firebase auth data changed to determine when to fetch necessary profile, to login and logout.
 
 | **Option**  | **Type**                                                                                                           | **Description**                                                                                                                                                                                    | **Default** |
 |-------------|--------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
 | getQuery    | (conditions: [any][type-object]) => [Query][firestore-query]                                                     | `required` A function to return a [Firestore Query][firestore-query] for filter user profile, since we only take first found document, a query with `limit(1)` is recommended                      |             |
-| getSnapshot | (query: [Query][firestore-query], onChange: [Function][type-function], onError: [Function][type-function]) => [Unsubscribe][firestore-unsubscribe] | `required` A function to start watching profiles query snapshot. Usually we will need to pass down `onChange` and `onError` to snapshot creator. For example `query.onSnapshot(onChange, onError)` | `{}`        |
+| getSnapshot | (query: [Query][firestore-query], onChange: [Function][type-function], onError: [Function][type-function]) => [Unsubscribe][firestore-unsubscribe] | `required` A function to start watching profiles query snapshot. Usually we will need to bind `onChange` and `onError` to snapshot creator. For example `query.onSnapshot(onChange, onError)` |         |
 | userIdField | string                                                                                                             | User id field for adding into conditions                                                                                                                                                           | `uid`     |
 | criteria    | [any][type-object]                                                                                                 | Additional criteria to filter profile data with firebase user id                                                                                                                                   |             |
 
-### Access auth data with React hook
+### Access auth data with AuthContext
 
 We profile a React hook to listen for auth data context changes
 
@@ -116,6 +149,16 @@ The `auth` context value presents authentication state of all available [drivers
 ### Using Auth0 with Firebase
 
 For combine Auth0 with Firebase, we need to setup a [cloud function](https://firebase.google.com/docs/functions) for using Firebase Admin SDK to create [custom tokens](https://firebase.google.com/docs/auth/admin/create-custom-tokens).
+
+Here is an example of `getCustomToken` function:
+```ts
+const getCustomToken = async token => {
+  const exchangeToken = firebase.functions().httpsCallable('auth')
+  const { data } = exchangeToken({ t: token })
+
+  return data.token
+}
+```
 
 After auth0 done authenticated a user, if the user's email has been verified, `react-auth` will try to authenticate the user through custom tokens, hence allow the user to access firebase resources.
 
@@ -139,7 +182,10 @@ Thank you.
 
 [npm-url]: https://www.npmjs.com/package/@teku-blocks/react-auth
 [npm-downloads-badge]: https://img.shields.io/npm/dw/@teku-blocks/react-auth
-[npm-version-badge]: https://badge.fury.io/js/@teku-blocks/react-auth.svg
+[npm-version-badge]: https://img.shields.io/npm/v/@teku-blocks/react-auth.svg
+[code-style]: https://img.shields.io/badge/code_style-standard-brightgreen.svg
+[code-style-url]: https://standardjs.com
+[code-install-size]: https://packagephobia.com/badge?p=@teku-blocks/react-auth
 
 [type-error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
 [type-object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object
@@ -155,3 +201,6 @@ Thank you.
 [firebase-functions]: https://firebase.google.com/docs/reference/js/firebase.functions
 [firestore-query]: https://firebase.google.com/docs/reference/js/firebase.firestore.Query
 [firestore-unsubscribe]: https://firebase.google.com/docs/reference/js/v9/firestore_.unsubscribe
+
+[firestore]: https://firebase.google.com/docs/firestore
+[auth0]: https://auth0.com/

@@ -3,24 +3,21 @@ const webpack = require('webpack')
 const glob = require('fast-glob')
 const { zipObject } = require('lodash')
 const nodeExternals = require('webpack-node-externals')
+const dtsGenerator = require('dts-generator').default
 
-// const { pathExists } = require('fs-extra')
 const {
   NODE_ENV = 'development'
 } = process.env
 
+const resolvePath = subPath => resolve(__dirname, subPath)
+const expandedEntriesPath = process.env.ENTRY_PATH || '{packages,react}/*'
 const getConfig = async () => {
   return {
-    entry: Object.assign(
-      await expandEntries('packages/*'),
-      await expandEntries('react/*')
-      // TODO: Enable react components compilation after getting setup fixed
-      // ...await expandEntries('packages/react/controls', '**/*.tsx')
-    ),
+    entry: await expandEntries(expandedEntriesPath),
     mode: NODE_ENV,
     target: 'node',
     output: {
-      path: resolve(__dirname),
+      path: __dirname,
       filename: ({ chunk: { name } }) => {
         return name.replace(/\.tsx?$/, '.js') // may change index.ts to index.js
       },
@@ -28,7 +25,6 @@ const getConfig = async () => {
       // libraryExport: 'default'
     },
     resolve: {
-      // alias: await expandAliases(['react'], NODE_ENV), // TODO: attermpting to fix React https://github.com/tekuasia/blocks/issues/4
       extensions: [
         '.ts',
         '.js',
@@ -48,27 +44,13 @@ const getConfig = async () => {
     },
     externals: Object.assign(
       nodeExternals()
-      // Use external version of React
-      // TODO: attempting to fix React issue
-      // @see https://github.com/tekuasia/blocks/issues/4
-
-      // NODE_ENV === 'production' && {
-      //   react: 'umd react',
-      //   'react-dom': 'umd react-dom',
-      //   classnames: 'classnames',
-      //   plyr: 'plyr',
-      //   'styled-components': 'styled-components',
-      //   inputmask: 'inputmask'
-      // }
     ),
     plugins: [
-    // new CleanWebpackPlugin(),
+      // new CleanWebpackPlugin(),
+      new DtsGeneratorPlugin(),
       new webpack.DefinePlugin({
-      // APP_VERSION: JSON.stringify(pkg.version),
-      // APP_NAME: JSON.stringify(pkg.name),
         NODE_ENV: JSON.stringify(NODE_ENV)
       })
-      // NODE_ENV === 'production' && new webpack.IgnorePlugin(/react/)
     ],
     watch: NODE_ENV === 'development',
     devtool: NODE_ENV === 'development' && 'inline-source-map'
@@ -81,23 +63,70 @@ const expandEntries = async (packagePath, pattern = '**/index.ts') => {
   return zipObject(files, files.map(f => resolve(join(__dirname, f))))
 }
 
-// const expandAliases = async (aliases, env = 'development') => {
-//   return zipObject(aliases, await Promise.all(aliases.map(async alias => {
-//     const guessingPaths = [
-//       `alias/${alias}.${env}.ts`,
-//       `alias/${alias}.ts`
-//     ]
-
-//     for (let i = 0, l = guessingPaths.length, currentPath; i < l; i++) {
-//       currentPath = guessingPaths[i]
-
-//       if (await pathExists(currentPath)) {
-//         return resolve(__dirname, currentPath)
-//       }
-//     }
-
-//     throw Error(`No path found for alias '${alias}'`)
-//   })))
-// }
-
 module.exports = getConfig
+
+class DtsGeneratorPlugin {
+  apply (compiler) {
+    const MODULE_PATH_REGEX = /([^/]+\/[^/]+)/
+    let builtModulePaths = []
+
+    compiler.hooks.compilation.tap('DtsGeneratorPlugin: Setup compilation', (compilation) => {
+      compilation.hooks.succeedModule.tap('DtsGeneratorPlugin: Collect built module', module => {
+        if (module.constructor.name !== 'NormalModule') {
+          return
+        }
+
+        const fileSubPath = module.context.replace(__dirname, '')
+        const matches = fileSubPath.match(MODULE_PATH_REGEX)
+
+        if (matches && builtModulePaths.indexOf(matches[0]) === -1) {
+          builtModulePaths.push(matches[0])
+        }
+      })
+    })
+
+    compiler.hooks.beforeCompile.tapAsync(
+      'DtsGeneratorPlugin: Start built modules collection',
+      (compilation, callback) => {
+        builtModulePaths = []
+
+        callback()
+      })
+
+    compiler.hooks.afterCompile.tapAsync('DtsGeneratorPlugin: generate definitions', (compilation, callback) => {
+      builtModulePaths.forEach(async p => {
+        try {
+          const packageInfo = require(resolvePath(`${p}/package.json`))
+          const typesFile = packageInfo.types
+          const packageName = packageInfo.name
+
+          if (!typesFile) {
+            return
+          }
+
+          await dtsGenerator({
+            eol: '\n',
+            project: resolvePath(p),
+            out: resolvePath(`${p}/${typesFile}`),
+            resolveModuleId: ({ importedModuleId, currentModuleId, isDeclaredExternalModule }) => {
+              return currentModuleId === 'index'
+                ? packageName
+                : packageName + '/' + currentModuleId.replace(/^src\/?/, '')
+            },
+            resolveModuleImport: ({ importedModuleId, currentModuleId, isDeclaredExternalModule }) => {
+              const isInternalModule = !isDeclaredExternalModule && importedModuleId.indexOf('.') === 0
+
+              return isInternalModule
+                ? packageName + '/' + importedModuleId.replace(/^\.\.?\/?/, '').replace(/^src\/?/, '')
+                : importedModuleId
+            }
+          })
+        } catch (err) {
+          console.error(err)
+        }
+      })
+
+      callback()
+    })
+  }
+}

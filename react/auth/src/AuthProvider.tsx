@@ -1,29 +1,31 @@
-import omit from 'lodash-es/omit'
-import each from 'lodash-es/each'
-import kindOf from 'kind-of'
 import React, { FunctionComponent, useEffect, useState } from 'react'
+
+import { each, is, omit } from './lib'
 import AuthContext from './AuthContext'
 import Auth0Client, { Auth0ClientOptions } from './clients/Auth0Client'
 import FirebaseAuthClient, { FirebaseAuthClientOptions } from './clients/FirebaseAuthClient'
 import AuthDrivers from './AuthDrivers'
-import FirebaseProfileClient from './clients/FirebaseProfileClient'
+import FirebaseProfileClient, { FirebaseProfileClientOptions } from './clients/FirebaseProfileClient'
+import FirebasePermissionsClient from './permissions/FirebasePermissionsClient'
 
 interface AuthProviderProps {
-  withAuth0?: Auth0ClientOptions
-  withFirebaseAuth?: FirebaseAuthClientOptions
-  withFirebaseProfile?: any
-  onUserChange?: (driverId: AuthDrivers, user: any) => void
-  onError?: (driverId: AuthDrivers, error: Error) => void
+  withAuth0: Auth0ClientOptions
+  withFirebaseAuth: FirebaseAuthClientOptions
+  withFirebaseProfile: FirebaseProfileClientOptions
+  withFirebasePermissions: any
+  onUserChange: (driverId: AuthDrivers, user: any) => void
+  onError: (driverId: AuthDrivers, error: Error) => void
 }
 
 type ClientType = Auth0Client | FirebaseAuthClient
-const clients: {[key in AuthDrivers]?: ClientType} = {}
+export const clients: {[key in AuthDrivers]?: ClientType} = {}
 
-const AuthProvider: FunctionComponent<AuthProviderProps> = ({
+const AuthProvider: FunctionComponent<Partial<AuthProviderProps>> = ({
   children,
   withAuth0,
   withFirebaseAuth,
   withFirebaseProfile,
+  withFirebasePermissions,
   onUserChange,
   onError
 }) => {
@@ -47,18 +49,22 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({
       [AuthDrivers.FIREBASE_PROFILE]: {
         config: withFirebaseProfile,
         Client: FirebaseProfileClient
+      },
+      [AuthDrivers.FIREBASE_PERMISSIONS]: {
+        config: withFirebasePermissions,
+        Client: FirebasePermissionsClient
       }
     }
 
     // PREPARE CLIENTS
     each(configMap, ({ config, Client }, driverId) => {
-      if (kindOf(config) === 'object') {
+      if (is('object', config)) {
         const client = new Client(config)
 
         // Bind events
         client.on('user:set', (user: any) => {
           onUserChange?.(client.driverId, user)
-          setAuth(auth => ({
+          setAuth((auth: any) => ({
             ...auth,
             [client.driverId]: user
           }))
@@ -66,7 +72,7 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({
 
         client.on('user:unset', (user: any) => {
           onUserChange?.(client.driverId, null)
-          setAuth(auth => omit(auth, client.driverId))
+          setAuth((auth: any) => omit(auth, client.driverId))
         })
 
         client.on('error', (err: Error) => {

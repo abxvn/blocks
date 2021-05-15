@@ -1,8 +1,7 @@
-import { createContext, useContext } from 'react'
+import { createContext } from 'react'
 
 const AuthContext = createContext({})
 
 AuthContext.displayName = 'ReactAuthContext'
 
 export default AuthContext
-export const useAuth = (): any => useContext(AuthContext)

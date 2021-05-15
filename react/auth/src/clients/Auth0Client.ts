@@ -1,8 +1,6 @@
-import EventEmitter from 'eventemitter3'
-import kindOf from 'kind-of'
 import { AuthorizeOptions, WebAuth } from 'auth0-js'
-import get from 'lodash-es/get'
-import pick from 'lodash-es/pick'
+
+import { get, EventEmitter, pick, is } from '../lib'
 import AuthDrivers from '../AuthDrivers'
 import IAuthClient from './IAuthClient'
 
@@ -13,12 +11,12 @@ export interface Auth0Result {
 }
 
 export interface Auth0Profile {
+  _token: string
+  _tokenExpiresAt: number
   email: string
+  emailVerified: boolean
   name: string
   picture: string
-  verified: boolean
-  token: string
-  tokenExpiresAt: number
 }
 
 export interface Auth0ClientOptions {
@@ -27,7 +25,6 @@ export interface Auth0ClientOptions {
   redirectUri: string
   responseType?: string
   scope?: string
-  withFirebaseAuth?: boolean
 }
 
 export default class Auth0Client extends EventEmitter implements IAuthClient {
@@ -44,12 +41,11 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
 
     this.options = Object.assign({
       responseType: 'token id_token',
-      scope: 'openid profile email',
-      withFirebaseAuth: true
+      scope: 'openid profile email'
     }, options) as Auth0ClientOptions
 
     if (['domain', 'clientId', 'redirectUri'].some(
-      configKey => kindOf(get(this.options, configKey)) !== 'string'
+      configKey => !is('string', this.options, configKey)
     )) {
       throw TypeError("Auth0Client requires 'domain', 'clientId' and 'redirectUri'")
     }
@@ -65,18 +61,6 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
     }))
 
     this.once('site:load', window => this.onSiteLoad(window))
-    this.once('init', clients => {
-      if (typeof clients[AuthDrivers.FIREBASE_AUTH] === 'undefined' || this.options.withFirebaseAuth !== true) {
-        return
-      }
-
-      // Use Auth0 as main authenticator
-      // Firebase as sub-authenticator
-      const firebase = clients[AuthDrivers.FIREBASE_AUTH]
-
-      this.on('user:set', user => user.verified === true && firebase.emit('login:token', get(user, 'token')))
-      this.on('user:unset', () => firebase.onLogout())
-    })
   }
 
   onSiteLoad (window: any): void {
@@ -218,14 +202,14 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
       profile.name = get(result.profile, 'nickname', profile.name)
     }
 
-    const token = get(result, 'token')
-    const tokenExpiresAt = get(result, 'expiresAt')
-    const verified = get(result.profile, 'email_verified', 'verified')
+    const _token = get(result, 'token')
+    const _tokenExpiresAt = get(result, 'expiresAt')
+    const emailVerified = get(result.profile, 'email_verified', false)
 
     return Object.assign({
-      token,
-      tokenExpiresAt,
-      verified
+      _token,
+      _tokenExpiresAt,
+      emailVerified
     }, profile)
   }
 

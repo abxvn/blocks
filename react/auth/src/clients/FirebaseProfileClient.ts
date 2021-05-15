@@ -1,5 +1,5 @@
-import EventEmitter from 'eventemitter3'
-import get from 'lodash-es/get'
+import { get, EventEmitter } from '../lib'
+
 import AuthDrivers from '../AuthDrivers'
 import FirebaseAuthClient, { FirebaseAuthProfile } from './FirebaseAuthClient'
 import IAuthClient from './IAuthClient'
@@ -18,6 +18,7 @@ export default class FirebaseProfileClient extends EventEmitter implements IAuth
   private readonly getSnapshot: Function
   private readonly options: any
   private unsubscribe: Function | undefined
+  private hasSet: boolean = false
 
   constructor (options: FirebaseProfileClientOptions) {
     super()
@@ -32,6 +33,7 @@ export default class FirebaseProfileClient extends EventEmitter implements IAuth
     this.getQuery = getQuery
     this.options = otherOptions
 
+    this.once('user:set', () => (this.hasSet = true))
     this.once('init', clients => {
       if (typeof clients[AuthDrivers.FIREBASE_AUTH] === 'undefined') {
         throw TypeError(
@@ -51,13 +53,15 @@ export default class FirebaseProfileClient extends EventEmitter implements IAuth
       this.unsubscribe()
     }
 
-    this.emit('user:unset')
+    if (this.hasSet) {
+      this.emit('user:unset')
+    }
   }
 
   private _getProfile (user: FirebaseAuthProfile): void {
     const userIdField = get(this.options, 'userIdField', 'uid')
     const conditions = Object.assign({
-      [userIdField]: user.id
+      [userIdField]: user.uid
     }, get(this.options, 'criteria'))
 
     const query = this.getQuery(conditions)

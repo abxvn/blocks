@@ -121,6 +121,7 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
         this.emit('user:unset')
         this.onLogout()
       } else {
+        this.emit('user:load', null)
         this._reportError(err)
       }
     }
@@ -218,9 +219,13 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
       this.emit('error', err)
     } else {
       // auth0 has special error format (object)
+      const code = get(err, 'code')
       const message = get(err, 'error', get(err, 'errorDescription', 'unknown')).replace(/_/g, ' ')
 
-      this.emit('error', Error(message))
+      if (code !== 'login_required') {
+        // ignore sso error of auth0
+        this.emit('error', Error(message))
+      }
     }
   }
 }

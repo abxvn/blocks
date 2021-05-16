@@ -5,7 +5,7 @@ export { default as each } from 'lodash-es/each'
 export { default as pick } from 'lodash-es/pick'
 export { default as omit } from 'lodash-es/omit'
 
-export const get = _get
+export const get: typeof _get = _get
 export const typeOf = kindOf
 export const is = (checkedType: string | string[], data: any, path?: string): boolean => {
   const checkedValue = path !== undefined ? get(data, path) : data

@@ -15,6 +15,7 @@ Simple solution to make your React web application authentication / authorizatio
   + [Callbacks](#callbacks)
   + [Driver options](#driver-options)
   + [Access auth data with AuthContext](#access-auth-data-with-authcontext)
+  + [Render based on authentication status](#render-based-on-authentication-status)
   + [Using Auth0 with Firebase](#using-auth0-with-firebase)
 * [List of available driver ids](#list-of-available-driver-ids)
 * [Contribution](#contribution)
@@ -145,6 +146,31 @@ const auth = useAuth()
 The `auth` context value presents authentication state of all available [drivers](#list-of-available-driver-ids):
 
 > {[key in [AuthDrivers](#list-of-available-driver-ids)]}: [any][type-object]}
+
+### Render based on authentication status
+
+We provide a handy `AuthGate` ultility component for toggling display based on authentication state. In this example, `FallbackComponent` is displayed if user isn't authenticated yet:
+
+```jsx
+import { AuthGate } from '@teku-blocks/react-auth`
+
+<AuthGate FallbackComponent={() => 'Please login'}>
+{/* something to hide if user not authenticated */}
+</AuthGate>
+```
+
+If you want to show something else instead of `FallbackComponent` while the application is determining if user is authenticated or not (due to async flow), the `MaskComponent` option can be used as a placeholder during this process:
+
+```jsx
+import { AuthGate } from '@teku-blocks/react-auth`
+
+<AuthGate
+  FallbackComponent={() => 'Please login'}
+  MaskComponent={() => 'Verifying your authentication ...'}
+>
+{/* something to hide if user not authenticated */}
+</AuthGate>
+```
 
 ### Using Auth0 with Firebase
 

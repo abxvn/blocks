@@ -28,6 +28,7 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
   private readonly options: any
   private readonly client: any
   private hasSet: boolean = false
+  private readonly onAuthStateChanged: Function
 
   constructor (options: FirebaseAuthClientOptions) {
     super()
@@ -37,6 +38,7 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
     this.options = Object.assign({
       withAuth0: true
     }, otherOptions)
+    this.onAuthStateChanged = onAuthStateChanged
     if ([auth, onAuthStateChanged].some(e => e === undefined)) {
       throw TypeError('FirebaseAuthClient needs \'auth\' client and \'onAuthStateChanged\' callback')
     }
@@ -51,40 +53,10 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
 
     this.once('user:set', () => (this.hasSet = true))
     this.once('init', clients => {
-      // Connect to firebase auth SDK
-      onAuthStateChanged((user: any) => {
-        if (user !== null && user !== undefined) {
-          user.getIdTokenResult(true).then((result: any) => {
-            const customClaims = get(result, 'claims', {})
-            const customClaimMap = get(this.options, 'customClaimMap', {})
-
-            const profile: FirebaseAuthProfile = pick(user, [
-              'uid',
-              'email',
-              'emailVerified',
-              'phoneNumber',
-              'name'
-            ]) as FirebaseAuthProfile
-
-            profile._token = result.token
-            profile.picture = get(user, 'photoURL')
-
-            each(customClaimMap, (fromProp, toProp) => {
-              profile[toProp] = get(customClaims, fromProp)
-            })
-
-            this.emit('user:set', profile)
-          }).catch((err: Error) => {
-            this.emit('error', err)
-          })
-        } else if (this.hasSet) {
-          this.emit('user:unset')
-        }
-      })
-
       // Connect with Auth0
       if (this.options.withAuth0 !== true) {
-        return // not combining with Auth0
+        // not combining with Auth0
+        return this._bindAuthenticationState()
       }
 
       if (!is('function', this.options, 'getCustomToken')) {
@@ -99,18 +71,27 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
       // Firebase as sub-authenticator
       const auth0 = clients[AuthDrivers.AUTH0]
 
-      auth0.on('user:set', (auth0User: any) =>
-        auth0User.emailVerified === true &&
-        this.emit('login:token', get(auth0User, '_token'))
-      )
-      auth0.on('user:unset', () => this.onLogout())
+      // Sync auth state with auth0
+      return auth0.on('user:load', (auth0User: any) => {
+        const emailVerified = get(auth0User, 'emailVerified')
+
+        if (emailVerified === true && typeof auth0User._token === 'string') {
+          this._bindAuthenticationState()
+          this.emit('login:token', auth0User._token)
+        } else {
+          this.onLogout()
+        }
+      })
     })
   }
 
   onLogout (): void {
     try {
       this.client.signOut()
-      this.emit('user:unset')
+
+      if (this.hasSet) {
+        this.emit('user:unset')
+      }
     } catch (err) {
       this.emit('error', err)
     }
@@ -128,5 +109,38 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
     } catch (err) {
       this.emit('error', err)
     }
+  }
+
+  private _bindAuthenticationState (): void {
+    // Connect to firebase auth SDK
+    this.onAuthStateChanged((user: any) => {
+      if (user !== null && user !== undefined) {
+        user.getIdTokenResult(true).then((result: any) => {
+          const customClaims = get(result, 'claims', {})
+          const customClaimMap = get(this.options, 'customClaimMap', {})
+
+          const profile: FirebaseAuthProfile = pick(user, [
+            'uid',
+            'email',
+            'emailVerified',
+            'phoneNumber',
+            'name'
+          ]) as FirebaseAuthProfile
+
+          profile._token = result.token
+          profile.picture = get(user, 'photoURL')
+
+          each(customClaimMap, (fromProp, toProp) => {
+            profile[toProp] = get(customClaims, fromProp)
+          })
+
+          this.emit('user:set', profile)
+        }).catch((err: Error) => {
+          this.emit('error', err)
+        })
+      } else if (this.hasSet) {
+        this.emit('user:unset')
+      }
+    })
   }
 }

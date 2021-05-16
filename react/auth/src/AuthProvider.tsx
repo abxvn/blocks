@@ -61,18 +61,27 @@ const AuthProvider: FunctionComponent<Partial<AuthProviderProps>> = ({
       if (is('object', config)) {
         const client = new Client(config)
 
+        client.on('user:load', () => {
+          setAuth(auth => ({
+            ...auth,
+            loaded: true
+          }))
+        })
+
         // Bind events
         client.on('user:set', (user: any) => {
+          client.emit('user:load', user)
           onUserChange?.(client.driverId, user)
-          setAuth((auth: any) => ({
+          setAuth(auth => ({
             ...auth,
             [client.driverId]: user
           }))
         })
 
         client.on('user:unset', (user: any) => {
+          client.emit('user:load', null)
           onUserChange?.(client.driverId, null)
-          setAuth((auth: any) => omit(auth, client.driverId))
+          setAuth(auth => omit(auth, client.driverId))
         })
 
         client.on('error', (err: Error) => {

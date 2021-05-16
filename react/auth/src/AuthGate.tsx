@@ -27,10 +27,10 @@ interface AuthGateProps {
 }
 
 const AuthGate: FunctionComponent<AuthGateProps> = ({ children, withPermissions, FallbackComponent, MaskComponent }) => {
-  const { permissions: permissionsReady, auth0, firebase } = useContext<any>(AuthContext)
+  const { permissions: permissionsReady, auth0, firebase, loaded } = useContext<any>(AuthContext)
   const isAuthenticated: boolean = is('object', auth0) || is('object', firebase)
   const [isRendered, setIsRendered] = useState(isAuthenticated)
-  const [isTriggered, setIsTriggered] = useState<boolean | null>(null)
+  const [isTriggered, setIsTriggered] = useState<boolean | undefined>(loaded)
 
   useEffect(() => {
     if (typeof withPermissions !== 'function') {
@@ -54,9 +54,13 @@ const AuthGate: FunctionComponent<AuthGateProps> = ({ children, withPermissions,
   ])
 
   useEffect(() => {
-    // May avoid init render of FallbackComponent
-    setIsTriggered(isTriggered => isTriggered !== null)
-  }, [isRendered])
+    // Avoid init render of FallbackComponent
+    const timeout = setTimeout(() => {
+      setIsTriggered(isTriggered !== undefined)
+      clearTimeout(timeout)
+    }, 20)
+    // setIsTriggered(isTriggered !== undefined)
+  }, [loaded])
 
   return (
     <>

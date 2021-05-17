@@ -5,7 +5,7 @@
 [![Code style][code-style]][code-style-url]
 [![Install size][code-install-size]][npm-url]
 
-Simple solution to make your React web application authentication / authorization. Designed to work with [Auth0](https://auth0.com/docs/libraries/auth0js), [Firebase v8](https://firebase.google.com/support/release-notes/js) and  [Firebase v9](https://firebase.google.com/docs/web/modular-upgrade).
+Simple solution to make your React web application authentication / authorization. Designed to work with [Auth0](https://auth0.com/docs/libraries/auth0-single-page-app-sdk), [Firebase v8](https://firebase.google.com/support/release-notes/js) and  [Firebase v9](https://firebase.google.com/docs/web/modular-upgrade).
 
 **Table of contents**
 * [Installation](#installation)
@@ -221,7 +221,7 @@ Thank you.
 
 [auth0-basic]: https://auth0.com/docs/get-started/dashboard/application-settings#basic-information
 [auth0-uris]: https://auth0.com/docs/get-started/dashboard/application-settings#application-uris
-[auth0-options]: https://auth0.com/docs/libraries/auth0js#available-parameters
+[auth0-options]: https://auth0.github.io/auth0-spa-js/interfaces/auth0clientoptions.html
 
 [firebase-auth]: https://firebase.google.com/docs/reference/js/firebase.auth
 [firebase-functions]: https://firebase.google.com/docs/reference/js/firebase.functions

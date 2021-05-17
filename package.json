@@ -7,7 +7,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack",
     "start": "webpack",
-    "lint": "eslint packages/**/*.ts react/**/*.{ts,tsx} gatsby/**/*.js"
+    "lint": "eslint packages/**/*.ts react/*/src/*.{ts,tsx} react/*/index.ts gatsby/**/*.js"
   },
   "repository": {
     "type": "git",

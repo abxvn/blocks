@@ -1,4 +1,4 @@
-import { AuthorizeOptions, WebAuth } from 'auth0-js'
+import createAuth0Client, { Auth0Client as Auth0SpaClient, RedirectLoginOptions } from '@auth0/auth0-spa-js'
 
 import { get, EventEmitter, pick, is } from '../lib'
 import AuthDrivers from '../AuthDrivers'
@@ -33,7 +33,7 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
   readonly driverId = AuthDrivers.AUTH0
 
   private readonly options: Auth0ClientOptions
-  private readonly client: WebAuth
+  private client: Auth0SpaClient | undefined = undefined
   private ssoInterval: any = null
 
   constructor (options: Auth0ClientOptions) {
@@ -50,21 +50,20 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
       throw TypeError("Auth0Client requires 'domain', 'clientId' and 'redirectUri'")
     }
 
-    this.client = new WebAuth(Object.assign({}, this.options, {
-      clientID: this.options.clientId
-    }))
-
     this.on('logout', () => this.onLogout())
     this.on('login', () => this.onLogin())
-    this.on('signup', () => this.onLogin({
-      screen_hint: 'signup'
-    }))
+    this.on('signup', () => this.onLogin({ screen_hint: 'signup' }))
 
-    this.once('site:load', window => this.onSiteLoad(window))
+    // Function handles errors internally
+    // eslint-disable-next-line no-void
+    this.once('init', () => void this._getClient())
+    this.once('site:load', window => {
+      void this._getClient().then(() => this._onSiteLoad(window)) // eslint-disable-line no-void
+    })
   }
 
-  onSiteLoad (window: any): void {
-    const { pathname, hash, origin } = get(window, 'location', {})
+  _onSiteLoad (window: any): void {
+    const { pathname, href, origin } = get(window, 'location', {})
 
     if (
       pathname !== undefined &&
@@ -72,27 +71,28 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
     ) {
       // Function handles errors internally
       // eslint-disable-next-line no-void
-      void this._handleCallback(hash)
-    } else if (hash === '') {
+      void this._handleCallback(href)
+    } else {
       // Function handles errors internally
       // eslint-disable-next-line no-void
       void this._handleSilentSSO()
     }
   }
 
-  onLogin (options?: AuthorizeOptions): void {
-    try {
-      this.client.authorize(options)
-    } catch (err) {
-      this._reportError(err)
+  onLogin (options?: RedirectLoginOptions): void {
+    if (this.client === undefined) {
+      throw Error('Client has not been setup yet')
     }
+
+    this.client.loginWithRedirect(options)
+      .catch(err => this._reportError(err))
   }
 
   onLogout (): void {
     try {
-      this.client.logout({
+      this.client?.logout({
         returnTo: window.location.origin,
-        clientID: this.options.clientId
+        client_id: this.options.clientId
       })
       this.emit('user:unset')
     } catch (err) {
@@ -127,68 +127,64 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
     }
   }
 
-  private async _handleCallback (hash: string | undefined): Promise<void> {
+  private async _handleCallback (url: string | undefined): Promise<void> {
     try {
-      if (hash?.includes('access_token=') === true) {
-        const result = await this._parseHash()
+      if (url?.includes('?code=') === true) {
+        const result = await this._parseHash(url)
 
         this.emit('user:set', this._getProfile(result))
       } else {
-        this.onLogin()
+        // this.onLogin()
       }
     } catch (err) {
       this._reportError(err)
     }
   }
 
-  private async _parseHash (): Promise<Auth0Result> {
-    return await new Promise((resolve, reject) => {
-      this.client.parseHash((err, result) => {
-        if (err != null) {
-          return reject(err)
-        }
+  private async _parseHash (url?: string): Promise<Auth0Result> {
+    if (this.client === undefined) {
+      throw Error('Client has not been setup yet')
+    }
 
-        const token: string = get(result, 'idToken') ?? ''
+    await this.client.handleRedirectCallback(url)
 
-        if (token === '') {
-          return reject(Error('No id token found'))
-        }
+    const result = await this.client.getIdTokenClaims()
+    const token: string = get(result, '__raw') ?? ''
 
-        const profile = get(result, 'idTokenPayload', {})
-        const expiresAt = get(result, 'idTokenPayload.exp', 0) * 1000
+    if (token === '') {
+      throw Error('No id token found')
+    }
 
-        return resolve({
-          token,
-          profile,
-          expiresAt
-        })
-      })
-    })
+    const expiresAt = get(result, 'exp', 0)
+
+    return {
+      token,
+      profile: result,
+      expiresAt
+    }
   }
 
   private async _checkSession (): Promise<Auth0Result> {
-    return await new Promise((resolve, reject) => {
-      this.client.checkSession({}, (err, result) => {
-        if (err != null) {
-          return reject(err)
-        }
+    if (this.client === undefined) {
+      throw Error('Client has not been setup yet')
+    }
 
-        const token: string = get(result, 'idToken') ?? ''
+    await this.client.getTokenSilently()
 
-        if (token === '') {
-          return reject(Error('No id token found'))
-        }
+    const result = await this.client.getIdTokenClaims()
+    const token: string = get(result, '__raw') ?? ''
 
-        const profile = get(result, 'idTokenPayload', {})
-        const expiresAt = get(result, 'idTokenPayload.exp', 0) * 1000
+    if (token === '') {
+      throw Error('No id token found')
+    }
 
-        return resolve({
-          token,
-          profile,
-          expiresAt
-        })
-      })
-    })
+    const expiresAt = get(result, 'exp', 0)
+
+    return {
+      token,
+      profile: result,
+      expiresAt
+    }
   }
 
   private _getProfile (result: Auth0Result): Auth0Profile {
@@ -214,18 +210,32 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
     }, profile)
   }
 
-  private _reportError (err: any): void {
-    if (err instanceof Error) {
-      this.emit('error', err)
-    } else {
-      // auth0 has special error format (object)
-      const code = get(err, 'code')
-      const message = get(err, 'error', get(err, 'errorDescription', 'unknown')).replace(/_/g, ' ')
+  private _reportError (err: Error): void {
+    const code = get(err, 'error')
 
-      if (code !== 'login_required') {
-        // ignore sso error of auth0
-        this.emit('error', Error(message))
+    if (code !== 'login_required') {
+      // ignore sso error of auth0
+      this.emit('error', Error(err.message))
+    }
+  }
+
+  private async _getClient (): Promise<Auth0SpaClient | null> {
+    try {
+      if (this.client !== undefined) {
+        return this.client
       }
+
+      this.client = await createAuth0Client(Object.assign({}, this.options, {
+        client_id: this.options.clientId,
+        redirect_uri: this.options.redirectUri,
+        useRefreshTokens: true
+      }))
+
+      return this.client
+    } catch (err) {
+      this._reportError(err)
+
+      return null
     }
   }
 }

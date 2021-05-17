@@ -1,6 +1,6 @@
 {
   "name": "@teku-blocks/react-auth",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Teku's react authentication",
   "types": "index.d.ts",
   "files": [
@@ -34,7 +34,7 @@
     "@types/auth0-js": "^9.14.4",
     "@types/kind-of": "^6.0.0",
     "eventemitter3": "^4.0.7",
-    "auth0-js": "^9.16.0",
+    "@auth0/auth0-spa-js": "^1.15.0",
     "kind-of": "^6.0.3",
     "lodash-es": "^4.17.21"
   },

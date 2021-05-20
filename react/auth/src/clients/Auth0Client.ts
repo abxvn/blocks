@@ -129,12 +129,14 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
 
   private async _handleCallback (url: string | undefined): Promise<void> {
     try {
-      if (url?.includes('?code=') === true) {
+      if (url?.includes('?error=') === true) {
+        //
+      } else if (url?.includes('?code=') === true) {
         const result = await this._parseHash(url)
 
         this.emit('user:set', this._getProfile(result))
       } else {
-        // this.onLogin()
+        this.onLogin()
       }
     } catch (err) {
       this._reportError(err)

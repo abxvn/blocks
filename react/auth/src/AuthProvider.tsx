@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useEffect, useState } from 'react'
 
-import { each, is, omit } from './lib'
+import { forOwn, is, omit } from './lib'
 import AuthContext from './AuthContext'
 import Auth0Client, { Auth0ClientOptions } from './clients/Auth0Client'
 import FirebaseAuthClient, { FirebaseAuthClientOptions } from './clients/FirebaseAuthClient'
@@ -57,7 +57,7 @@ const AuthProvider: FunctionComponent<Partial<AuthProviderProps>> = ({
     }
 
     // PREPARE CLIENTS
-    each(configMap, ({ config, Client }, driverId) => {
+    forOwn(configMap, ({ config, Client }, driverId) => {
       if (is('object', config)) {
         const client = new Client(config)
 
@@ -92,13 +92,15 @@ const AuthProvider: FunctionComponent<Partial<AuthProviderProps>> = ({
       }
     })
 
+    const clientInstances = Object.values(clients)
+
     // INIT CLIENTS
-    Object.values(clients).forEach(client => {
+    clientInstances.forEach(client => {
       client?.emit('init', clients)
     })
 
     // TRIGGER SITE LOAD
-    Object.values(clients).forEach(client => {
+    clientInstances.forEach(client => {
       client?.emit('site:load', window)
     })
   }, [])

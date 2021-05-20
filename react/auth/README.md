@@ -26,6 +26,11 @@ Simple solution to make your React web application authentication / authorizatio
 npm install --dev @teku-blocks/react-auth
 ```
 
+Install other dependencies
+```shell
+npm install --dev @auth0/auth0-spa-js kind-of eventemitter3
+```
+
 ## Concept
 
 There are 3 supported auth drivers:

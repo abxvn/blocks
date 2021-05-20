@@ -1,7 +1,7 @@
 import EventEmitter from 'eventemitter3'
 import AuthDrivers from '../AuthDrivers'
 import IAuthClient from './IAuthClient'
-import { is, each, get, pick } from '../lib'
+import { is, forOwn, get, pick } from '../lib'
 
 export interface FirebaseAuthProfile {
   uid: string
@@ -130,7 +130,7 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
           profile._token = result.token
           profile.picture = get(user, 'photoURL')
 
-          each(customClaimMap, (fromProp, toProp) => {
+          forOwn(customClaimMap, (fromProp, toProp) => {
             profile[toProp] = get(customClaims, fromProp)
           })
 

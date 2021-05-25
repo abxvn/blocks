@@ -30,17 +30,17 @@
     "url": "https://github.com/tekuasia/blocks/issues?q=is%3Aopen+is%3Aissue+label%3Apackage%3Areact-auth"
   },
   "homepage": "https://github.com/tekuasia/blocks/tree/main/react/auth#readme",
-  "devDependencies": {
-    "@types/auth0-js": "^9.14.4",
-    "@types/kind-of": "^6.0.0",
+  "dependencies": {
     "eventemitter3": "^4.0.7",
     "@auth0/auth0-spa-js": "^1.15.0",
-    "kind-of": "^6.0.3",
-    "lodash-es": "^4.17.21"
+    "kind-of": "^6.0.3"
   },
-  "peerDependencies": {
+  "devDependencies": {
+    "preact": "^10.5.13",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "@types/react": "^17.0.6",
+    "@types/auth0-js": "^9.14.4",
+    "@types/kind-of": "^6.0.0"
   },
   "publishConfig": {
     "access": "public"

@@ -56,10 +56,9 @@ const AuthGate: FunctionComponent<AuthGateProps> = ({ children, withPermissions,
   useEffect(() => {
     // Avoid init render of FallbackComponent
     const timeout = setTimeout(() => {
-      setIsTriggered(isTriggered !== undefined)
+      setIsTriggered(isTriggered => isTriggered !== undefined)
       clearTimeout(timeout)
     }, 20)
-    // setIsTriggered(isTriggered !== undefined)
   }, [loaded])
 
   return (

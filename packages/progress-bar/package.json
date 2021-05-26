@@ -1,5 +1,5 @@
 {
-  "name": "@teku-blocks/progress-bar",
+  "name": "@teku/progress-bar",
   "private": true,
   "version": "1.0.0",
   "description": "Teku's progress-bar library",

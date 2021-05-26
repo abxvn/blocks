@@ -63,7 +63,7 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish
-        run: lerna exec --scope @teku-blocks/firebase -- npm  publish
+        run: lerna exec --scope @teku/firebase -- npm  publish
 
   move:
     name: Move task to Released

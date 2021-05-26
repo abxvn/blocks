@@ -1,7 +1,7 @@
-@teku-blocks/react-auth
+@teku/react-auth
 =====
-[![@teku-blocks/react-auth version][npm-version-badge]][npm-url]
-[![@teku-blocks/react-auth downloads per months][npm-downloads-badge]][npm-url]
+[![@teku/react-auth version][npm-version-badge]][npm-url]
+[![@teku/react-auth downloads per months][npm-downloads-badge]][npm-url]
 [![Code style][code-style]][code-style-url]
 <!-- [![Install size][code-install-size]][npm-url] -->
 
@@ -26,7 +26,7 @@ Simple solution to make your React web application authentication / authorizatio
 ## Installation
 
 ```shell
-npm install --dev @teku-blocks/react-auth
+npm install --dev @teku/react-auth
 ```
 
 ## Concept
@@ -45,7 +45,7 @@ After initialization, these [drivers](#driver-options) will automatically handle
 We provide `AuthProvider` for wrapping your components / pages, which will automatically handle authentication process for you.
 
 ```jsx
-import { AuthProvider } from '@teku-blocks/react-auth'
+import { AuthProvider } from '@teku/react-auth'
 
 <AuthProvider {...options}>
   {children}
@@ -141,7 +141,7 @@ This driver requires `withFirebaseAuth` to be setup, it will **watch** for fireb
 We profile a React hook to listen for auth data context changes
 
 ```jsx
-import { useAuth } from '@teku-blocks/react-auth`
+import { useAuth } from '@teku/react-auth`
 
 const auth = useAuth()
 ```
@@ -155,7 +155,7 @@ The `auth` context value presents authentication state of all available [drivers
 We provide a handy `AuthGate` ultility component for toggling display based on authentication state. In this example, `FallbackComponent` is displayed if user isn't authenticated yet:
 
 ```jsx
-import { AuthGate } from '@teku-blocks/react-auth`
+import { AuthGate } from '@teku/react-auth`
 
 <AuthGate FallbackComponent={() => 'Please login'}>
 {/* something to hide if user not authenticated */}
@@ -165,7 +165,7 @@ import { AuthGate } from '@teku-blocks/react-auth`
 If you want to show something else instead of `FallbackComponent` while the application is determining if user is authenticated or not (due to async flow), the `MaskComponent` option can be used as a placeholder during this process:
 
 ```jsx
-import { AuthGate } from '@teku-blocks/react-auth`
+import { AuthGate } from '@teku/react-auth`
 
 <AuthGate
   FallbackComponent={() => 'Please login'}
@@ -212,7 +212,7 @@ We also provide a Preact [compat](https://preactjs.com/guide/v10/switching-to-pr
 ```js
 resolve: {
   alias: {
-    '@teku-blocks/react-auth': '@teku-blocks/react-auth/preact'
+    '@teku/react-auth': '@teku/react-auth/preact'
   }
 }
 ```
@@ -238,12 +238,12 @@ All contributions are welcome. Feel free to open PR or share your ideas of impro
 
 Thank you.
 
-[npm-url]: https://www.npmjs.com/package/@teku-blocks/react-auth
-[npm-downloads-badge]: https://img.shields.io/npm/dw/@teku-blocks/react-auth
-[npm-version-badge]: https://img.shields.io/npm/v/@teku-blocks/react-auth.svg
+[npm-url]: https://www.npmjs.com/package/@teku/react-auth
+[npm-downloads-badge]: https://img.shields.io/npm/dw/@teku/react-auth
+[npm-version-badge]: https://img.shields.io/npm/v/@teku/react-auth.svg
 [code-style]: https://img.shields.io/badge/code_style-standard-brightgreen.svg
 [code-style-url]: https://standardjs.com
-<!-- [code-install-size]: https://packagephobia.com/badge?p=@teku-blocks/react-auth -->
+<!-- [code-install-size]: https://packagephobia.com/badge?p=@teku/react-auth -->
 
 [type-error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
 [type-object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object

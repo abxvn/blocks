@@ -1,5 +1,5 @@
 {
-  "name": "@teku-blocks/pluggable",
+  "name": "@teku/pluggable",
   "files": [
     "README.md",
     "LICENSE",

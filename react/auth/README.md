@@ -82,14 +82,14 @@ The driver options ([objects][type-object]) will be used to initialize authentic
 
 These are only options which is required or provided with default values. More auth0 options can be found at [Auth0 options][auth0-options]
 
-| **Option**       | **Type**                | **Description**                                                                                                 | **Default**            |
-|------------------|-------------------------|-----------------------------------------------------------------------------------------------------------------|------------------------|
-| domain           | [string][type-string]   | `required` Domain registed with Auth0 [more info][auth0-basic]                                                  |                        |
-| clientId         | [string][type-string]   | `required` Auth0 client id [more info][auth0-basic]                                                             |                        |
-| redirectUri      | [string][type-string]   | `required` Callback after Auth0 authentication [more info][auth0-uris]                                          |                        |
-| responseType     | [string][type-string]   | Response type                                                                                                   | `token id_token`       |
-| scope            | [string][type-string]   | Scope                                                                                                           | `openid profile email` |
-
+| **Option**        | **Type**              | **Description**                                                            | **Default**            |
+|-------------------|-----------------------|----------------------------------------------------------------------------|------------------------|
+| domain            | [string][type-string] | `required` Domain registed with Auth0 [more info][auth0-basic]             |                        |
+| clientId          | [string][type-string] | `required` Auth0 client id [more info][auth0-basic]                        |                        |
+| loginRedirectUri  | [string][type-string] | `required` Callback URL after Auth0 authentication [more info][auth0-uris] |                        |
+| logoutRedirectUri | [string][type-string] | `required` Callback URL after Auth0 SSO logout [more info][auth0-uris]     |                        |
+| responseType      | [string][type-string] | Response type                                                              | `token id_token`       |
+| scope             | [string][type-string] | Scope                                                                      | `openid profile email` |
 
 **Authenticated Auth0 profile contains these fields:**
 - `_token`: auth token
@@ -111,7 +111,7 @@ These are options of Firebase auth driver:
 | customClaimMap      | [any][type-object]                          | Map fields from custom claims into solved user                                                                                       | `{}`                                   |
 | customTokenMap      | [any][type-object]                          | Provide fields to be used during custom token exchanges when you combine firebase with auth0 [more info](#using-auth0-with-firebase) | `{ inputName: 't', outputName: 'ct' }` |
 | getCustomToken           | (token: [string][type-string]) => Promise<[string][type-string]>             | Only required when you combine firebase with auth0, `async` function to resolve with custom token [more info](#using-auth0-with-firebase)                                           |                                        |
-| withAuth0 | [boolean][type-boolean] | Whether should firebase combine with auth0  |  `true`                 |
+| boundToAuth0 | [boolean][type-boolean] | Whether should firebase combine with auth0  |  `true`                 |
 
 **Authenticated FirebaseAuth profile contains these fields:**
 - `_token`: auth token

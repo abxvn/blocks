@@ -22,7 +22,8 @@ export interface Auth0Profile {
 export interface Auth0ClientOptions {
   domain: string
   clientId: string
-  redirectUri: string
+  loginRedirectUri: string,
+  logoutRedirectUri: string,
   responseType?: string
   scope?: string
 }
@@ -44,10 +45,10 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
       scope: 'openid profile email'
     }, options) as Auth0ClientOptions
 
-    if (['domain', 'clientId', 'redirectUri'].some(
+    if (['domain', 'clientId', 'loginRedirectUri', 'logoutRedirectUri'].some(
       configKey => !is('string', this.options, configKey)
     )) {
-      throw TypeError("Auth0Client requires 'domain', 'clientId' and 'redirectUri'")
+      throw TypeError("Auth0Client requires 'domain', 'clientId', 'loginRedirectUri' and 'logoutRedirectUri'")
     }
 
     this.on('logout', () => this.onLogout())
@@ -55,10 +56,11 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
     this.on('signup', () => this.onLogin({ screen_hint: 'signup' }))
 
     // Function handles errors internally
-    // eslint-disable-next-line no-void
-    this.once('init', () => void this._getClient())
+    this.once('init', () => void this._getClient()) // eslint-disable-line no-void
+    // Function handles errors internally
     this.once('site:load', window => {
-      void this._getClient().then(() => this._onSiteLoad(window)) // eslint-disable-line no-void
+      void this._getClient() // eslint-disable-line no-void
+        .then(() => this._onSiteLoad(window))
     })
   }
 
@@ -67,7 +69,7 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
 
     if (
       pathname !== undefined &&
-      this.options.redirectUri.replace(/\/$/, '') === `${origin as string}${pathname as string}`.replace(/\/$/, '')
+      this.options.loginRedirectUri.replace(/\/$/, '') === `${origin as string}${pathname as string}`.replace(/\/$/, '')
     ) {
       // Function handles errors internally
       // eslint-disable-next-line no-void
@@ -91,10 +93,13 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
   onLogout (): void {
     try {
       this.client?.logout({
-        returnTo: window.location.origin,
+        returnTo: this.options.logoutRedirectUri,
         client_id: this.options.clientId
       })
-      this.emit('user:unset')
+
+      // Softly notify about on-going logout process
+      // instead of remove user in state immediately
+      this.emit('user:load', null)
     } catch (err) {
       this._reportError(err)
     }
@@ -233,7 +238,7 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
 
       this.client = await createAuth0Client(Object.assign({}, this.options, {
         client_id: this.options.clientId,
-        redirect_uri: this.options.redirectUri,
+        redirect_uri: this.options.loginRedirectUri,
         useRefreshTokens: true
       }))
 

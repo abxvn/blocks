@@ -1,5 +1,5 @@
 {
-  "name": "@teku-blocks/firebase",
+  "name": "@teku/firebase",
   "version": "0.0.11-alpha",
   "files": [
     "README.md",

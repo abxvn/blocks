@@ -1,4 +1,4 @@
-@teku-blocks/resolve
+@teku/resolve
 =====
 Provide an async [`node require.resolve algorithmn`](https://nodejs.org/api/modules.html#modules_all_together), with **extra features:**
   - ⚡ Blazingly faster comparing to vanilla [require.resolve](https://nodejs.org/api/moduleshtml#modules_require_resolve_request_options) ([bench](#benchmarks)) (Especially when you need to work with large amount of modules)
@@ -21,7 +21,7 @@ Installation
 -----
 Install using `yarn` or `npm`:
 ```
-yarn add @teku-blocks/resolve
+yarn add @teku/resolve
 ```
 
 Usage
@@ -29,7 +29,7 @@ Usage
 ### Resolves modules in async way
 The `resolve` function return a Promise with module's entry path and package.json contents, which some other information (as a [TekuModule](#TekuModule))
 ```js
-import resolve from `@teku-blocks/resolve`
+import resolve from `@teku/resolve`
 
 /** @var ITekuModule */
 const module = await resolve('moduleA')
@@ -44,7 +44,7 @@ console.log(module.entry) // node_modules/moduleA/index.js
 We can pass custom options into the resolver:
 
 ```js
-import resolve, { createResolver } from `@teku-blocks/resolve`
+import resolve, { createResolver } from `@teku/resolve`
 
 resolve('moduleB', options) // pass through resolve function
 createResolver(options) // pass through a shared resolver

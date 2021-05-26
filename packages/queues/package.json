@@ -1,5 +1,5 @@
 {
-  "name": "@teku-blocks/queues",
+  "name": "@teku/queues",
   "files": [
     "README.md",
     "LICENSE",

@@ -18,7 +18,7 @@ export interface FirebaseAuthClientOptions {
   auth: any
   onAuthStateChanged: (user: any) => void
   customClaimMap?: {[key: string]: string}
-  withAuth0?: boolean
+  boundToAuth0?: boolean
   getCustomToken?: (token: string) => Promise<string>
 }
 
@@ -36,7 +36,7 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
     const { auth, onAuthStateChanged, ...otherOptions } = options
 
     this.options = Object.assign({
-      withAuth0: true
+      boundToAuth0: true
     }, otherOptions)
     this.onAuthStateChanged = onAuthStateChanged
     if ([auth, onAuthStateChanged].some(e => e === undefined)) {
@@ -54,7 +54,7 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
     this.once('user:set', () => (this.hasSet = true))
     this.once('init', clients => {
       // Connect with Auth0
-      if (this.options.withAuth0 !== true) {
+      if (this.options.boundToAuth0 !== true) {
         // not combining with Auth0
         return this._bindAuthenticationState()
       }
@@ -64,12 +64,16 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
       }
 
       if (typeof clients[AuthDrivers.AUTH0] === 'undefined') {
-        throw Error('FirebaseAuthClient cannot find Auth0 client to combine with, anyway withAuth0 can be turned off using options')
+        throw Error('FirebaseAuthClient cannot find Auth0 client to combine with, anyway boundToAuth0 can be turned off using options')
       }
 
       // Use Auth0 as main authenticator
       // Firebase as sub-authenticator
       const auth0 = clients[AuthDrivers.AUTH0]
+
+      // Tightly bound auth0 and firebase
+      // So notify auth0 to logout when user logout
+      this.once('user:unset', () => auth0.emit('logout'))
 
       // Sync auth state with auth0
       return auth0.on('user:load', (auth0User: any) => {

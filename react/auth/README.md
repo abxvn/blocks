@@ -111,7 +111,7 @@ These are options of Firebase auth driver:
 | customClaimMap      | [any][type-object]                          | Map fields from custom claims into solved user                                                                                       | `{}`                                   |
 | customTokenMap      | [any][type-object]                          | Provide fields to be used during custom token exchanges when you combine firebase with auth0 [more info](#using-auth0-with-firebase) | `{ inputName: 't', outputName: 'ct' }` |
 | getCustomToken           | (token: [string][type-string]) => Promise<[string][type-string]>             | Only required when you combine firebase with auth0, `async` function to resolve with custom token [more info](#using-auth0-with-firebase)                                           |                                        |
-| withAuth0 | [boolean][type-boolean] | Whether should firebase combine with auth0  |  `true`                 |
+| boundToAuth0 | [boolean][type-boolean] | Whether should firebase combine with auth0  |  `true`                 |
 
 **Authenticated FirebaseAuth profile contains these fields:**
 - `_token`: auth token

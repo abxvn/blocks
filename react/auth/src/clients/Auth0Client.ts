@@ -94,7 +94,10 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
         returnTo: window.location.origin,
         client_id: this.options.clientId
       })
-      this.emit('user:unset')
+
+      // Softly notify about on-going logout process
+      // instead of remove user in state immediately
+      this.emit('user:load', null)
     } catch (err) {
       this._reportError(err)
     }

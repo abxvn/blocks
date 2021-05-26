@@ -1,3 +1,4 @@
+const { basename } = require('path')
 const dtsGenerator = require('dts-generator').default
 const { resolvePath, rootPath } = require('../paths')
 
@@ -45,15 +46,17 @@ class DtsGeneratorPlugin {
             project: resolvePath(p),
             out: resolvePath(`${p}/${typesFile}`),
             resolveModuleId: ({ importedModuleId, currentModuleId, isDeclaredExternalModule }) => {
-              return currentModuleId === 'index'
-                ? packageName
+              const isIndexModule = basename(currentModuleId) === 'index'
+
+              return isIndexModule
+                ? [packageName, currentModuleId.replace(/\/?index$/, '')].filter(Boolean).join('/')
                 : packageName + '/.internal/' + currentModuleId.replace(/^src\/?/, '')
             },
             resolveModuleImport: ({ importedModuleId, currentModuleId, isDeclaredExternalModule }) => {
               const isInternalModule = !isDeclaredExternalModule && importedModuleId.indexOf('.') === 0
 
               return isInternalModule
-                ? packageName + '/.internal/' + importedModuleId.replace(/^\.\.?\/?/, '').replace(/^src\/?/, '')
+                ? packageName + importedModuleId.replace(/^\.+\/src\//, '/.internal/')
                 : importedModuleId
             }
           })

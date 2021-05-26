@@ -1,13 +1,14 @@
 {
   "name": "@teku/react-auth",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Teku's react authentication",
   "types": "index.d.ts",
   "files": [
     "index.d.ts",
     "README.md",
     "LICENSE",
-    "*.js"
+    "**/index.js",
+    "index.js"
   ],
   "repository": {
     "type": "git",

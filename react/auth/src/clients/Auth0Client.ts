@@ -6,7 +6,7 @@ import IAuthClient from './IAuthClient'
 
 export interface Auth0Result {
   token: string
-  profile: any
+  claims: any
   expiresAt: number
 }
 
@@ -25,24 +25,28 @@ export interface Auth0ClientOptions {
   loginRedirectUri: string,
   logoutRedirectUri: string,
   responseType?: string
-  scope?: string
+  scope?: string,
+  useRefreshTokens?: boolean,
+  ssoCheckInterval?: number
 }
 
 export default class Auth0Client extends EventEmitter implements IAuthClient {
-  static readonly SSO_DELAY = 20 * 60 * 1000 // 20min
+  static readonly POSSIBLE_SSO_LOGOUT = 'POSSIBLE_SSO_LOGOUT'
 
   readonly driverId = AuthDrivers.AUTH0
 
   private readonly options: Auth0ClientOptions
   private client: Auth0SpaClient | undefined = undefined
-  private ssoInterval: any = null
+  private ssoCheckTimer: any = null
+  private _profile: any = null // cached profile
 
   constructor (options: Auth0ClientOptions) {
     super()
 
     this.options = Object.assign({
       responseType: 'token id_token',
-      scope: 'openid profile email'
+      scope: 'openid profile email',
+      useRefreshTokens: true
     }, options) as Auth0ClientOptions
 
     if (['domain', 'clientId', 'loginRedirectUri', 'logoutRedirectUri'].some(
@@ -106,20 +110,44 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
   }
 
   private async _handleSilentSSO (): Promise<void> {
-    const isFirstCall = this.ssoInterval === null
+    const isFirstCall = this.ssoCheckTimer === null
 
     try {
-      // Possibly restored from redux persist
-      const result = await this._checkSession()
+      if (this.client === undefined) {
+        throw Error('Client has not been setup yet')
+      }
 
-      this.emit('user:set', this._getProfile(result))
+      await this.client.getTokenSilently()
 
-      if (isFirstCall) {
-        this.ssoInterval = setInterval(() => {
+      const claims = await this.client.getIdTokenClaims()
+      const token: string = get(claims, '__raw') ?? ''
+      const expiresAt = get(claims, 'exp', 0)
+      const profile = this._getProfile({ token, claims, expiresAt })
+
+      if (token === '') {
+        const err = Error('No token found')
+        err.name = Auth0Client.POSSIBLE_SSO_LOGOUT
+
+        throw err
+      }
+
+      this.setProfile(profile)
+
+      if (this.options.ssoCheckInterval === undefined) {
+        const delay = Math.round(expiresAt - Date.now() / 1000) * 1000
+        this.ssoCheckTimer = setTimeout(() => {
+          clearTimeout(this.ssoCheckTimer)
           // Function handles errors internally
           // eslint-disable-next-line no-void
           void this._handleSilentSSO()
-        }, Auth0Client.SSO_DELAY)
+        }, delay)
+      } else {
+        this.ssoCheckTimer = setTimeout(() => {
+          clearTimeout(this.ssoCheckTimer)
+          // Function handles errors internally
+          // eslint-disable-next-line no-void
+          void this._handleSilentSSO()
+        }, this.options.ssoCheckInterval)
       }
     } catch (err) {
       if (!isFirstCall) {
@@ -137,9 +165,22 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
       if (url?.includes('?error=') === true) {
         this.onLogout()
       } else if (url?.includes('?code=') === true) {
-        const result = await this._parseHash(url)
+        if (this.client === undefined) {
+          throw Error('Client has not been setup yet')
+        }
 
-        this.emit('user:set', this._getProfile(result))
+        await this.client.handleRedirectCallback(url)
+        const claims = await this.client.getIdTokenClaims()
+        const token: string = get(claims, '__raw') ?? ''
+        const expiresAt = get(claims, 'exp', 0)
+
+        if (token === '') {
+          throw Error('No token found')
+        }
+
+        const profile = this._getProfile({ token, claims, expiresAt })
+
+        this.setProfile(profile)
       } else {
         this.onLogin()
       }
@@ -148,54 +189,8 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
     }
   }
 
-  private async _parseHash (url?: string): Promise<Auth0Result> {
-    if (this.client === undefined) {
-      throw Error('Client has not been setup yet')
-    }
-
-    await this.client.handleRedirectCallback(url)
-
-    const result = await this.client.getIdTokenClaims()
-    const token: string = get(result, '__raw') ?? ''
-
-    if (token === '') {
-      throw Error('No id token found')
-    }
-
-    const expiresAt = get(result, 'exp', 0)
-
-    return {
-      token,
-      profile: result,
-      expiresAt
-    }
-  }
-
-  private async _checkSession (): Promise<Auth0Result> {
-    if (this.client === undefined) {
-      throw Error('Client has not been setup yet')
-    }
-
-    await this.client.getTokenSilently()
-
-    const result = await this.client.getIdTokenClaims()
-    const token: string = get(result, '__raw') ?? ''
-
-    if (token === '') {
-      throw Error('No id token found')
-    }
-
-    const expiresAt = get(result, 'exp', 0)
-
-    return {
-      token,
-      profile: result,
-      expiresAt
-    }
-  }
-
   private _getProfile (result: Auth0Result): Auth0Profile {
-    const profile = pick(result.profile, [
+    const profile = pick(result.claims, [
       'email',
       'name',
       'picture'
@@ -203,12 +198,12 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
 
     if (profile.name === profile.email) {
       // User hasn't set custom name
-      profile.name = get(result.profile, 'nickname', profile.name)
+      profile.name = get(result.claims, 'nickname', profile.name)
     }
 
     const _token = get(result, 'token')
     const _tokenExpiresAt = get(result, 'expiresAt')
-    const emailVerified = get(result.profile, 'email_verified', false)
+    const emailVerified = get(result.claims, 'email_verified', false)
 
     return Object.assign({
       _token,
@@ -238,8 +233,7 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
 
       this.client = await createAuth0Client(Object.assign({}, this.options, {
         client_id: this.options.clientId,
-        redirect_uri: this.options.loginRedirectUri,
-        useRefreshTokens: true
+        redirect_uri: this.options.loginRedirectUri
       }))
 
       return this.client
@@ -247,6 +241,13 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
       this._reportError(err)
 
       return null
+    }
+  }
+
+  private setProfile (profile: any): void {
+    if (JSON.stringify(this._profile) !== JSON.stringify(profile)) {
+      this._profile = profile
+      this.emit('user:set', this._profile)
     }
   }
 }

@@ -111,7 +111,6 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
   }
 
   private _queueSilentSSO (delay: number): void {
-    console.log('queued', delay)
     this.ssoCheckTimer = setTimeout(() => {
       clearTimeout(this.ssoCheckTimer)
       // Function handles errors internally

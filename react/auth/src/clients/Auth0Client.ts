@@ -110,6 +110,16 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
     }
   }
 
+  private _queueSilentSSO (delay: number): void {
+    console.log('queued', delay)
+    this.ssoCheckTimer = setTimeout(() => {
+      clearTimeout(this.ssoCheckTimer)
+      // Function handles errors internally
+      // eslint-disable-next-line no-void
+      void this._handleSilentSSO()
+    }, delay)
+  }
+
   private async _handleSilentSSO (): Promise<void> {
     try {
       if (this.client === undefined) {
@@ -131,23 +141,7 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
       }
 
       this.setProfile(profile)
-
-      if (this.options.ssoCheckInterval === undefined) {
-        const delay = Math.round(expiresAt - Date.now() / 1000) * 1000
-        this.ssoCheckTimer = setTimeout(() => {
-          clearTimeout(this.ssoCheckTimer)
-          // Function handles errors internally
-          // eslint-disable-next-line no-void
-          void this._handleSilentSSO()
-        }, delay)
-      } else {
-        this.ssoCheckTimer = setTimeout(() => {
-          clearTimeout(this.ssoCheckTimer)
-          // Function handles errors internally
-          // eslint-disable-next-line no-void
-          void this._handleSilentSSO()
-        }, this.options.ssoCheckInterval)
-      }
+      this._queueSilentSSO(this.options.ssoCheckInterval ?? Math.round(expiresAt - Date.now() / 1000) * 1000)
     } catch (err) {
       if (this.hasSet) {
         this.emit('user:unset')
@@ -180,6 +174,7 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
         const profile = this._getProfile({ token, claims, expiresAt })
 
         this.setProfile(profile)
+        this._queueSilentSSO(this.options.ssoCheckInterval ?? Math.round(expiresAt - Date.now() / 1000) * 1000)
       } else {
         this.onLogin()
       }

@@ -15,7 +15,6 @@ const getConfig = async (entries, envName = 'development') => {
         return name.replace(/\.tsx?$/, '.js') // may change index.ts to index.js
       },
       libraryTarget: 'commonjs2'
-      // libraryExport: 'default'
     },
     resolve: {
       extensions: [
@@ -40,7 +39,6 @@ const getConfig = async (entries, envName = 'development') => {
       nodeExternals()
     ],
     plugins: [
-      // new CleanWebpackPlugin(),
       new ImportReplacementPlugin({
         react: 'preact/compat',
         'react-dom': 'preact/compat'

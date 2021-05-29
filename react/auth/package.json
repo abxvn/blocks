@@ -1,6 +1,6 @@
 {
   "name": "@teku/react-auth",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "description": "Teku's react authentication",
   "types": "index.d.ts",
   "files": [

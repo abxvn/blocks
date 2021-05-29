@@ -38,6 +38,7 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
   private readonly options: Auth0ClientOptions
   private client: Auth0SpaClient | undefined = undefined
   private ssoCheckTimer: any = null
+  private hasSet: boolean = false
   private _profile: any = null // cached profile
 
   constructor (options: Auth0ClientOptions) {
@@ -110,8 +111,6 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
   }
 
   private async _handleSilentSSO (): Promise<void> {
-    const isFirstCall = this.ssoCheckTimer === null
-
     try {
       if (this.client === undefined) {
         throw Error('Client has not been setup yet')
@@ -150,7 +149,7 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
         }, this.options.ssoCheckInterval)
       }
     } catch (err) {
-      if (!isFirstCall) {
+      if (this.hasSet) {
         this.emit('user:unset')
         this.onLogout()
       } else {
@@ -247,6 +246,7 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
   private setProfile (profile: any): void {
     if (JSON.stringify(this._profile) !== JSON.stringify(profile)) {
       this._profile = profile
+      this.hasSet = true
       this.emit('user:set', this._profile)
     }
   }

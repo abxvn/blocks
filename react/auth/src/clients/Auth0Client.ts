@@ -13,6 +13,7 @@ export interface Auth0Result {
 export interface Auth0Profile {
   _token: string
   _tokenExpiresAt: number
+  uid: string
   email: string
   emailVerified: boolean
   name: string
@@ -32,6 +33,7 @@ export interface Auth0ClientOptions {
 
 export default class Auth0Client extends EventEmitter implements IAuthClient {
   static readonly POSSIBLE_SSO_LOGOUT = 'POSSIBLE_SSO_LOGOUT'
+  static readonly DEFAULT_SSO_INTERVAL = 10 * 60 * 1000 // 10min if queue interval isn't greater than 0
 
   readonly driverId = AuthDrivers.AUTH0
 
@@ -116,7 +118,7 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
       // Function handles errors internally
       // eslint-disable-next-line no-void
       void this._handleSilentSSO()
-    }, delay)
+    }, delay > 0 ? delay : Auth0Client.DEFAULT_SSO_INTERVAL)
   }
 
   private async _handleSilentSSO (): Promise<void> {
@@ -125,7 +127,11 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
         throw Error('Client has not been setup yet')
       }
 
-      await this.client.getTokenSilently()
+      if (!this.hasSet) {
+        await this.client.getTokenSilently()
+      } else {
+        await this.client.checkSession()
+      }
 
       const claims = await this.client.getIdTokenClaims()
       const token: string = get(claims, '__raw') ?? ''
@@ -140,7 +146,7 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
       }
 
       this.setProfile(profile)
-      this._queueSilentSSO(this.options.ssoCheckInterval ?? Math.round(expiresAt - Date.now() / 1000) * 1000)
+      this._queueSilentSSO(this.options.ssoCheckInterval ?? Math.floor(expiresAt - Date.now() / 1000) * 1000)
     } catch (err) {
       if (this.hasSet) {
         this.emit('user:unset')
@@ -196,11 +202,13 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
 
     const _token = get(result, 'token')
     const _tokenExpiresAt = get(result, 'expiresAt')
+    const uid = get(result.claims, 'sub', null)
     const emailVerified = get(result.claims, 'email_verified', false)
 
     return Object.assign({
       _token,
       _tokenExpiresAt,
+      uid,
       emailVerified
     }, profile)
   }
@@ -238,7 +246,8 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
   }
 
   private setProfile (profile: any): void {
-    if (JSON.stringify(this._profile) !== JSON.stringify(profile)) {
+    // Only update when uid is different
+    if (get(this._profile, 'uid') !== get(profile, 'uid')) {
       this._profile = profile
       this.hasSet = true
       this.emit('user:set', this._profile)

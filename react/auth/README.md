@@ -96,6 +96,7 @@ These are only options which is required or provided with default values. More a
 **Authenticated Auth0 profile contains these fields:**
 - `_token`: auth token
 - `_tokenExpiresAt`: token expiration timestamp
+- `uid`: user id / sub
 - `email`: user email
 - `emailVerified`: where the user email has been verified
 - `name`: user name

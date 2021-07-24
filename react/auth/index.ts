@@ -6,3 +6,6 @@ export { default as AuthGate } from './src/AuthGate'
 export { default as AuthDrivers } from './src/AuthDrivers'
 export { default as AuthProvider, trigger, triggerAll } from './src/AuthProvider'
 export { IPermissions } from './src/permissions/permissionTypes'
+
+// types
+export { default as FirebasePermissionsClient } from './src/permissions/FirebasePermissionsClient'

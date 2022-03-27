@@ -77,7 +77,7 @@ export default class TekuResolver implements ITekuResolver {
     } catch (err) {
       const module = new TekuModule(path)
 
-      module.error = err
+      module.error = err instanceof Error ? err : new Error(String(err))
 
       return module
     }

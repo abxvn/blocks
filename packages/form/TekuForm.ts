@@ -107,7 +107,7 @@ export default class TekuForm extends EventEmitter implements ITekuForm {
           }
         }
       } catch (err) {
-        errors.push(upperFirst(this.translate(err.message)))
+        errors.push(upperFirst(this.translate(getKey(err, 'message'))))
 
         if (this.opt('shouldFailFast') as boolean) {
           break

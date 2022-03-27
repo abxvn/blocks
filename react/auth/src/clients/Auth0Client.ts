@@ -213,7 +213,7 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
     }, profile)
   }
 
-  private _reportError (err: Error): void {
+  private _reportError (err: any): void {
     const code = get(err, 'error')
 
     if (code !== 'login_required') {

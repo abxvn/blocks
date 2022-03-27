@@ -41,7 +41,7 @@ export default class TaskManager extends EventEmitter {
       this.successfulTasks.push(task.id)
       this.emit('task:success', task)
     } catch (err) {
-      task.error = err
+      task.error = err instanceof Error ? err : new Error(String(err))
       this.emit('task:error', task)
     } finally {
       task.status = TaskStatus.DONE

@@ -1,9 +1,10 @@
 import { cyan, green, grey, red, yellow } from 'chalk'
-import { line, tick, cross } from 'figures'
+import figures from 'figures'
 import { assign, map, max, padEnd, round } from 'lodash'
 import IProgressBarItem from './IProgressBarItem'
 import ProgressBar from './ProgressBar'
 
+const { line, tick, cross } = figures
 const replaceTokens = (str: string, tokens: any): string => str.replace(/\{(\w+)\}/g, (_, key) => tokens[key] ?? key)
 
 export const createProgress = (data: IProgressBarItem[] = [], options: any = {}): ProgressBar => {

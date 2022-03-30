@@ -53,8 +53,8 @@ const getConfig = async (entries, envName = 'development') => {
   }
 }
 
-exports = module.exports = async () => {
-  const expandedEntriesPath = process.env.ENTRY_PATH || '{packages,react}/*'
+exports = module.exports = async env => {
+  const expandedEntriesPath = env.ENTRY_PATH || process.env.ENTRY_PATH || '{packages,react}/*'
   const entries = await expandEntries(expandedEntriesPath)
 
   return getConfig(entries, process.env.NODE_ENV)

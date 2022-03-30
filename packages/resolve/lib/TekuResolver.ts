@@ -34,6 +34,7 @@ export default class TekuResolver implements ITekuResolver {
     const moduleNames = modules.map(m => m.meta.name)
 
     const result: {[key: string]: ITekuModule} = {}
+
     moduleNames.forEach((name, idx) => {
       result[name] = modules[idx]
     })
@@ -50,6 +51,7 @@ export default class TekuResolver implements ITekuResolver {
       } else if (FS_BASED_MODULE_REGEX.test(path)) {
         // possible file or directory path
         let fullPath = resolvePath(baseDirPath, path)
+
         if (fullPath === '.' || fullPath === '..' || path.slice(-1) === '/') {
           fullPath += '/'
         }
@@ -103,6 +105,7 @@ export default class TekuResolver implements ITekuResolver {
       ? [joinPath(path, module.meta.main)]
       : extensions.map(ext => joinPath(path, `index.${ext}`))
     let mainFile
+
     for (const mainFilePath of mainFilePosibilities) {
       if (await isFile(mainFilePath)) {
         mainFile = mainFilePath
@@ -127,6 +130,7 @@ export default class TekuResolver implements ITekuResolver {
     ]
 
     let resolvedPath
+
     for (const filePath of filePosibilities) {
       if (await isFile(filePath)) {
         resolvedPath = filePath

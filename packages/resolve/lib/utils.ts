@@ -7,6 +7,7 @@ export { default as isCoreModule } from 'is-core-module'
 
 // fs
 const isFsNonExistsError = (err: any): boolean => err.code === 'ENOENT' || err.code === 'ENOTDIR'
+
 export const isFile = async (path: string): Promise<boolean> => {
   try {
     const stats = await fs.stat(path)
@@ -39,6 +40,7 @@ export const getYarnGlobalDirPath = (): string => globalDirs.yarn.packages
 export const getNpmGlobalDirPath = (): string => globalDirs.npm.packages
 export const getPathNodeModulesDirs = (path: string, nodeModulesDir: string): string[] => {
   let prefix = '/'
+
   if ((/^([A-Za-z]:)/).test(path)) {
     prefix = ''
   } else if (/^\\\\/.test(path)) {
@@ -47,6 +49,7 @@ export const getPathNodeModulesDirs = (path: string, nodeModulesDir: string): st
 
   const dirs = [path]
   let parsed = parse(path)
+
   // Go up
   while (parsed.dir !== dirs[dirs.length - 1]) {
     dirs.push(parsed.dir)
@@ -60,9 +63,11 @@ export const getPathNodeModulesDirs = (path: string, nodeModulesDir: string): st
 export const caller = (): string => {
   // see https://code.google.com/p/v8/wiki/JavaScriptStackTraceApi
   const origPrepareStackTrace = Error.prepareStackTrace
+
   Error.prepareStackTrace = function (_, stack) { return stack }
 
   const stack = (new Error()).stack as any
+
   Error.prepareStackTrace = origPrepareStackTrace
 
   return stack[2].getFileName()

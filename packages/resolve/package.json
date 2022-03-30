@@ -1,13 +1,17 @@
 {
   "name": "@teku/resolve",
-  "private": true,
   "version": "1.0.0",
   "description": "Teku's async resolve",
   "files": [
     "README.md",
     "LICENSE",
-    "components/"
+    "index.js",
+    "cli/index.js"
   ],
+  "bin": {
+    "resolve": "./cli/index.js"
+  },
+  "types": "index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tekuasia/blocks.git",

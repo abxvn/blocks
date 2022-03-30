@@ -13,6 +13,7 @@ Provide an async [`node require.resolve algorithmn`](https://nodejs.org/api/modu
   - [Resolves modules in async way](#resolves-modules-in-async-way)
   - [Options](#options)
   - [Resolves wildcard modules](#resolves-wildcard-modules)
+  - [Play with CLI](#play-with-cli)
 + [TekuModule](#tekumodule)
 + [Benchmarks](#benchmarks)
 + [Contribution](#contribution)
@@ -62,7 +63,7 @@ All options are optional (We already provided a good configuration for you):
 
 ### Resolves wildcard modules
 
-> For now we only support resolving wildcard from node_modules (our use cases at TekuAsia). If you need extra features please open new issue with `enhancement` label
+> For now we only support resolving wildcard from node_modules (our use cases). If you need extra features please open new issue with `enhancement` label
 
 For example, to resolve all modules belonging to [`@teku`](https://teku.asia) organization
 ```js
@@ -76,6 +77,20 @@ const tekuModules = await resolve('@teku/*')
 
 ### Resolves modules using custom file contents filter
 (Coming soon)
+
+### Play with CLI
+
+You can quickly check any modules' resolved information using command
+
+```bash
+resolve <module_paths>
+```
+
+if you want CLI to show resolved entry paths only, please call with flag `-p` or `--path-only`, for example:
+
+```bash
+resolve @teku/resolve lodash -p
+```
 
 TekuModule
 -----

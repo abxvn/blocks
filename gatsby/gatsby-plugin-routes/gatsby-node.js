@@ -14,7 +14,7 @@ exports.createPages = ({ actions }) => {
 
   mapViews(parsedRoutes, pluginOptions)
     .map(({ uri, view, layout, context }) => ({
-      path: uri,
+      path: uri.replace(/\/:/g, '/__'),
       matchPath: uri,
       component: view,
       context: Object.assign(context, layout && {

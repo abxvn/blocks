@@ -8,9 +8,7 @@
     "index.js",
     "cli/index.js"
   ],
-  "bin": {
-    "resolve": "./cli/index.js"
-  },
+  "bin": "./cli/index.js",
   "types": "index.d.ts",
   "repository": {
     "type": "git",

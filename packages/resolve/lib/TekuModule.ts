@@ -17,7 +17,7 @@ export default class TekuModule implements ITekuModule {
    *   - A function exported as default from its path (without meta)
    *   - A function exported as module.exports from its path (without meta)
    */
-  async execute<T extends any> (params: any[], context: any): Promise<T> {
+  async execute<T> (params: any[], context: any): Promise<T> {
     const exports = this.entry !== undefined && require(this.entry) // eslint-disable-line @typescript-eslint/no-var-requires
     const mainExport = exports.default ?? exports
 

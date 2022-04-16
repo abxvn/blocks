@@ -26,7 +26,7 @@ export interface ITekuModule {
    *   - A function exported as default from its path (without meta)
    *   - A function exported as module.exports from its path (without meta)
    */
-  execute: <T extends any>(params: any[], context: any) => Promise<T>
+  execute: <T>(params: any[], context: any) => Promise<T>
 }
 
 export interface ITekuResolver {

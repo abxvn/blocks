@@ -1,7 +1,7 @@
 import kindOf from 'kind-of'
 
 export const is = (type: string, value: any): boolean => type === kindOf(value)
-export const diff = (newData: any, oldData: any, ignoreRemovedItems: boolean = false): any => {
+export const diff = (newData: any, oldData: any, ignoreRemovedItems = false): any => {
   const newKeys = Object.keys(newData)
   const oldKeys = Object.keys(oldData)
   const diffData: any = {}
@@ -23,7 +23,7 @@ export const diff = (newData: any, oldData: any, ignoreRemovedItems: boolean = f
   return diffData
 }
 
-export const updateField = (oldData: any, inputOrEvent: any, customFieldName: string = ''): void => {
+export const updateField = (oldData: any, inputOrEvent: any, customFieldName = ''): void => {
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (!inputOrEvent) {
     throw Error('Input or event should be provided')

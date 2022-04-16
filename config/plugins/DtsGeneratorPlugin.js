@@ -1,6 +1,6 @@
-const { basename, dirname, resolve, join, normalize } = require('path')
+const { dirname, normalize } = require('path')
 const dtsGenerator = require('dts-generator').default
-const { resolvePath, rootPath } = require('../paths')
+const { resolvePath, rootPath, relativePath } = require('../paths')
 const glob = require('fast-glob')
 
 class DtsGeneratorPlugin {
@@ -14,7 +14,7 @@ class DtsGeneratorPlugin {
           return
         }
 
-        const fileSubPath = module.context.replace(rootPath, '').replace(/\\/g, '/')
+        const fileSubPath = relativePath(module.context)
         const matches = !fileSubPath.includes('node_modules') && fileSubPath.match(MODULE_PATH_REGEX)
 
         if (matches && builtModulePaths.indexOf(matches[0]) === -1) {
@@ -42,7 +42,7 @@ class DtsGeneratorPlugin {
             return
           }
 
-          const packagePath = `${rootPath.replace(/\\/g, '/')}/${p}`
+          const packagePath = `${rootPath}/${p}`
           // For avoiding generating types of other packages
           const sourceFiles = await glob([
             `${packagePath}/*.ts`,
@@ -76,7 +76,6 @@ class DtsGeneratorPlugin {
               const isInternalModuleImported = !isDeclaredExternalModule && importedModuleId.indexOf('.') === 0
               const currentModule = currentModuleId.replace(/\/index(\.[^\/])?$/, '').replace(new RegExp(`^${p}/?`), '')
               const importedModule = importedModuleId.replace(/\/index(\.[^\/])?$/, '').replace(new RegExp(`^${p}/?`), '')
-              const importingToMainModule = currentModule === ''
 
               if (!isInternalModuleImported) {
                 return currentModuleId

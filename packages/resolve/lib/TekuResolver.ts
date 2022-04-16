@@ -85,7 +85,7 @@ export default class TekuResolver implements ITekuResolver {
     }
   }
 
-  private async resolveFromDirectory (path: string, moduleOnly: boolean = false): Promise<ITekuModule> {
+  private async resolveFromDirectory (path: string, moduleOnly = false): Promise<ITekuModule> {
     const { packageFile, extensions } = this.options
 
     if (!await isDirectory(path)) {

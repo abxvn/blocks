@@ -46,6 +46,9 @@ const getConfig = async (entries, envName = 'development') => {
       new DtsGeneratorPlugin(),
       new webpack.DefinePlugin({
         NODE_ENV: JSON.stringify(envName)
+      }),
+      new webpack.IgnorePlugin({
+        resourceRegExp: /.md$/
       })
     ],
     watch: envName === 'development',

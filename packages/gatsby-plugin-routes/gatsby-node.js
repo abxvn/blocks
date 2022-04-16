@@ -54,7 +54,7 @@ exports.onPreInit = async ({ store }, options) => {
   const defaultConfigFile = resolvePath(workingDir, 'src/routes.js')
   const defaultOptions = {
     layout: 'index',
-    configFile: resolvePath(workingDir, 'src/routes.js'),
+    configFile: defaultConfigFile,
     viewDir: resolvePath(workingDir, 'src')
   }
 

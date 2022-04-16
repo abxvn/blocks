@@ -3,13 +3,11 @@
   "include": [
     ".eslintrc",
     "./packages/**/*.ts",
-    "./react/**/*.ts",
-    "./react/**/*.tsx"
+    "./packages/**/*.tsx"
   ],
   "exclude": [
     "node_modules",
     "./packages/*/node_modules/",
-    "./react/*/node_modules/",
     "**/*.d.ts",
     "**/*.js"
   ]

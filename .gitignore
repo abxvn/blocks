@@ -109,13 +109,9 @@ tmp/
 packages/**/index.js
 packages/**/*.d.ts
 packages/**/*.d.ts.map
-react/**/index.js
-react/**/*.d.ts
-react/**/*.d.ts.map
-react/controls/**/*.js
 
 # Temporary packages, to be removed
 temp/**/index.js
 temp/**/*.d.ts
 temp/**/*.d.ts.map
-temp/react/controls/**/*.js
+temp/react-utils/controls/**/*.js

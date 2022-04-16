@@ -1445,9 +1445,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@teku/react-auth@workspace:react/auth":
+"@teku/react-auth@workspace:packages/react-auth":
   version: 0.0.0-use.local
-  resolution: "@teku/react-auth@workspace:react/auth"
+  resolution: "@teku/react-auth@workspace:packages/react-auth"
   dependencies:
     "@auth0/auth0-spa-js": ^1.15.0
     "@types/auth0-js": ^9.14.4

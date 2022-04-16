@@ -62,8 +62,6 @@ exports.onPreInit = async ({ store }, options) => {
   pluginOptions.viewDir = normalizePath(pluginOptions.viewDir)
   pluginOptions.configFile = normalizePath(pluginOptions.configFile)
 
-  console.log(pluginOptions)
-
   const configFile = pluginOptions.configFile
 
   if (!await fs.pathExists(configFile)) {

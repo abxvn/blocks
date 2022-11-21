@@ -67,7 +67,9 @@ typings/
 
 # Yarn Integrity file
 .yarn-integrity
-.yarn
+.yarn/**
+!.yarn/releases
+!.yarn/releases/yarn-3.3.0.cjs
 .pnp.*
 
 # dotenv environment variables file

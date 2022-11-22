@@ -55,7 +55,7 @@ export default class FirestoreCollectionService implements IFirestoreCollectionS
 
     if (this.validArray(conditions)) {
       conditions.forEach(condition => {
-        query = query.where(...condition)
+        query = query.where.apply(query, condition)
       })
     }
 

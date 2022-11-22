@@ -1506,6 +1506,7 @@ __metadata:
     "@babel/core": ^7.17.9
     "@babel/preset-env": ^7.16.11
     "@babel/register": ^7.17.7
+    "@types/lodash": ^4.14.189
     axios: ^0.26.1
     chokidar: ^3.5.1
     fs-extra: ^10.0.1
@@ -1535,10 +1536,12 @@ __metadata:
     "@types/fs-extra": ^9.0.8
     "@types/global-dirs": ^1.0.0
     "@types/is-core-module": ^2.2.0
+    "@types/kind-of": ^6.0.0
     fast-glob: ^3.2.5
     fs-extra: ^10.0.1
     global-dirs: ^3.0.0
     is-core-module: ^2.2.0
+    kind-of: ^6.0.3
   bin:
     resolve: ./cli/index.js
   languageName: unknown
@@ -1659,7 +1662,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/lodash@npm:*":
+"@types/lodash@npm:*, @types/lodash@npm:^4.14.189":
   version: 4.14.189
   resolution: "@types/lodash@npm:4.14.189"
   checksum: 096d1e0954794fb76bd6a0ea443067f02004b53e3c59ac6e3fed88817a1468fc2e6614abdf44341f5e0fdff5f9a3c94a934cc9ff7126e07efbcd94355a21fe45

@@ -1,6 +1,6 @@
 {
   "name": "@teku/gatsby-plugin-routes",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "repository": {
     "url": "https://github.com/tekuasia/blocks",
     "directory": "gatsby/gatsby-plugin-routes",
@@ -35,5 +35,8 @@
     "fs-extra": "^10.0.1",
     "lodash": "^4.17.21"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@types/lodash": "^4.14.189"
+  }
 }

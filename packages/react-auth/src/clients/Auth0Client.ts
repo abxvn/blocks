@@ -103,10 +103,10 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
       // instead of remove user in state immediately
       this.emit('user:load', null)
 
-      this.client?.logout({
+      void this.client?.logout({
         returnTo: this.options.logoutRedirectUri,
         client_id: this.options.clientId
-      }).catch(_ => {})
+      })
     } catch (err) {
       this._reportError(err)
     }

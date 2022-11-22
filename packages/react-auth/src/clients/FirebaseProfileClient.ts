@@ -14,8 +14,8 @@ export interface FirebaseProfileClientOptions {
 export default class FirebaseProfileClient extends EventEmitter implements IAuthClient {
   readonly driverId = AuthDrivers.FIREBASE_PROFILE
 
-  private readonly getQuery: FirebaseProfileClientOptions[getQuery]
-  private readonly getSnapshot: FirebaseProfileClientOptions[getSnapshot]
+  private readonly getQuery: FirebaseProfileClientOptions['getQuery']
+  private readonly getSnapshot: FirebaseProfileClientOptions['getSnapshot']
   private readonly options: any
   private unsubscribe: Function | undefined
   private hasSet = false

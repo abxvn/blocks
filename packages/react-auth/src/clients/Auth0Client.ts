@@ -23,11 +23,11 @@ export interface Auth0Profile {
 export interface Auth0ClientOptions {
   domain: string
   clientId: string
-  loginRedirectUri: string,
-  logoutRedirectUri: string,
+  loginRedirectUri: string
+  logoutRedirectUri: string
   responseType?: string
-  scope?: string,
-  useRefreshTokens?: boolean,
+  scope?: string
+  useRefreshTokens?: boolean
   ssoCheckInterval?: number
 }
 
@@ -40,7 +40,7 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
   private readonly options: Auth0ClientOptions
   private client: Auth0SpaClient | undefined = undefined
   private ssoCheckTimer: any = null
-  private hasSet: boolean = false
+  private hasSet = false
   private _profile: any = null // cached profile
 
   constructor (options: Auth0ClientOptions) {
@@ -99,14 +99,14 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
 
   onLogout (): void {
     try {
-      this.client?.logout({
-        returnTo: this.options.logoutRedirectUri,
-        client_id: this.options.clientId
-      })
-
       // Softly notify about on-going logout process
       // instead of remove user in state immediately
       this.emit('user:load', null)
+
+      this.client?.logout({
+        returnTo: this.options.logoutRedirectUri,
+        client_id: this.options.clientId
+      }).catch(_ => {})
     } catch (err) {
       this._reportError(err)
     }
@@ -140,6 +140,7 @@ export default class Auth0Client extends EventEmitter implements IAuthClient {
 
       if (token === '') {
         const err = Error('No token found')
+
         err.name = Auth0Client.POSSIBLE_SSO_LOGOUT
 
         throw err

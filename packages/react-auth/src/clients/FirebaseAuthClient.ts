@@ -27,8 +27,8 @@ export default class FirebaseAuthClient extends EventEmitter implements IAuthCli
 
   private readonly options: any
   private readonly client: any
-  private hasSet: boolean = false
-  private readonly onAuthStateChanged: Function
+  private hasSet = false
+  private readonly onAuthStateChanged: FirebaseAuthClientOptions[onAuthStateChanged]
 
   constructor (options: FirebaseAuthClientOptions) {
     super()

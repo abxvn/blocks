@@ -1466,6 +1466,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^5.19.0
     "@typescript-eslint/parser": ^5.43.0
     "@typescript-eslint/typescript-estree": ^5.19.0
+    chalk: ^4
     clean-webpack-plugin: ^4.0.0
     cross-env: ^7.0.3
     dts-generator: ^3.0.0
@@ -2500,7 +2501,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chalk@npm:^4.0.0, chalk@npm:^4.1.0":
+"chalk@npm:^4, chalk@npm:^4.0.0, chalk@npm:^4.1.0":
   version: 4.1.2
   resolution: "chalk@npm:4.1.2"
   dependencies:

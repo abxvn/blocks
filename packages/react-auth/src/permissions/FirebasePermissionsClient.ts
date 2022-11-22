@@ -13,7 +13,7 @@ export interface FirebasePermissionsClientOptions {
 
 export default class FirebasePermissionsClient extends EventEmitter implements IAuthClient {
   readonly driverId = AuthDrivers.FIREBASE_PERMISSIONS
-  private hasSet: boolean = false
+  private hasSet = false
   private auth?: IFirebaseRuleAuth
 
   constructor (readonly options: FirebasePermissionsClientOptions) {

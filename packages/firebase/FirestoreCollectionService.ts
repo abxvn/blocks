@@ -11,7 +11,7 @@ import IFirestoreCollectionService from './lib/IFirestoreCollectionService'
 import { FirestorePluggableFilter } from './lib/types'
 
 export default class FirestoreCollectionService implements IFirestoreCollectionService {
-  defaultLimit: number = 20
+  defaultLimit = 20
   defaultValues = {}
 
   /**
@@ -41,7 +41,7 @@ export default class FirestoreCollectionService implements IFirestoreCollectionS
     return this.applyOutputFilters(doc)
   }
 
-  watchById (path: string, next: Function): void {
+  watchById (path: string, next: (...args: any) => void): void {
     const docRef = this.getDocRef(path)
 
     docRef.onSnapshot((doc: any) => {
